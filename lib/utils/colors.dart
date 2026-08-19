@@ -5,7 +5,7 @@ class CustomTheme {
   static ThemeData get DarkTheme {
     return ThemeData(
       dialogBackgroundColor: Color.fromRGBO(31, 29, 43, 1),
-      dialogTheme: DialogTheme(
+    dialogTheme: DialogThemeData(
           contentTextStyle:
               GoogleFonts.ubuntu(color: Colors.white, fontSize: 16),
           titleTextStyle: GoogleFonts.ubuntu(
@@ -27,7 +27,7 @@ class CustomTheme {
       scaffoldBackgroundColor:
           const Color.fromRGBO(31, 29, 43, 1), //background color
       primaryColor: const Color.fromRGBO(111, 111, 200, 1), //color of buttons
-      tabBarTheme: const TabBarTheme(
+    tabBarTheme: const TabBarThemeData(
           labelColor:
               Color.fromARGB(255, 216, 182, 57)), //color of tab bar label
     );

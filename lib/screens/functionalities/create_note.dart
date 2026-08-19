@@ -51,6 +51,7 @@ class _CreateNoteState extends State<CreateNote> {
                   if (value != null) {
                     CustomSnackBar.show(
                         context, '$value', Duration(seconds: 2));
+                    return;
                   }
                   Navigator.pop(context);
                 });
@@ -63,33 +64,30 @@ class _CreateNoteState extends State<CreateNote> {
               Expanded(
                 child: editor.QuillEditor(
                     focusNode: FocusNode(),
-                    scrollable: true,
-                    autoFocus: false,
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     scrollController: ScrollController(),
-                    expands: true,
                     controller: _controller,
-                    readOnly: false),
+                    config: const editor.QuillEditorConfig(
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      autoFocus: false,
+                      expands: true,
+                    )),
               ),
-              editor.QuillToolbar.basic(
+              editor.QuillSimpleToolbar(
                 controller: _controller,
-                multiRowsDisplay: false,
-                showIndent: true,
-                showImageButton: false,
-                dialogTheme: editor.QuillDialogTheme(
-                    inputTextStyle: TextStyle(color: Colors.white),
-                    labelTextStyle: TextStyle(color: Colors.white)),
-                showLink: true,
-                showDirection: false,
-                showBackgroundColorButton: false,
-                showRedo: true,
-                showSearchButton: true,
-                showFontSize: false,
-                showAlignmentButtons: true,
-                showCodeBlock: true,
-                showFontFamily: false,
-                showInlineCode: false,
-                showVideoButton: false,
+                config: const editor.QuillSimpleToolbarConfig(
+                  multiRowsDisplay: false,
+                  showIndent: true,
+                  showLink: true,
+                  showDirection: false,
+                  showBackgroundColorButton: false,
+                  showRedo: true,
+                  showSearchButton: true,
+                  showFontSize: false,
+                  showAlignmentButtons: true,
+                  showCodeBlock: true,
+                  showFontFamily: false,
+                  showInlineCode: false,
+                ),
               )
             ],
           ))

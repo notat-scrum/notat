@@ -14,7 +14,7 @@ class FirestoreFolderService {
     try {
       await _firestore.collection(userUid).doc('folders').set({'All': notes});
     } on FirebaseException catch (e) {
-      return e.message;
+      return e.message ?? 'Firebase error: ${e.code}';
     }
   }
 
@@ -27,7 +27,7 @@ class FirestoreFolderService {
       }
       await _firestore.collection(userUid).doc('folders').update({name: notes});
     } on FirebaseException catch (e) {
-      return e.message;
+      return e.message ?? 'Firebase error: ${e.code}';
     }
     return null;
   }
@@ -48,11 +48,11 @@ class FirestoreFolderService {
   Future<String?> addDocToFolder(
       {required String folderField, required String noteUid}) async {
     try {
-      _firestore.collection(userUid).doc('folders').update({
+      await _firestore.collection(userUid).doc('folders').update({
         folderField: FieldValue.arrayUnion([noteUid])
       });
     } on FirebaseException catch (e) {
-      return e.message;
+      return e.message ?? 'Firebase error: ${e.code}';
     }
     return null;
   }
@@ -82,11 +82,11 @@ class FirestoreFolderService {
   Future<String?> deleteDocFromFolder(
       {required String folderField, required String noteUid}) async {
     try {
-      _firestore.collection(userUid).doc('folders').update({
+      await _firestore.collection(userUid).doc('folders').update({
         folderField: FieldValue.arrayRemove([noteUid])
       });
     } on FirebaseException catch (e) {
-      return e.message;
+      return e.message ?? 'Firebase error: ${e.code}';
     }
     return null;
   }

@@ -120,27 +120,27 @@ class _NoteCardsState extends State<NoteCards> {
                                     ]).createShader(bounds);
                               }),
                               child: quill.QuillEditor(
-                                padding: const EdgeInsets.only(bottom: 10),
-                                autoFocus: true,
-                                enableInteractiveSelection: false,
-                                readOnly: true,
-                                showCursor: false,
-                                scrollPhysics:
-                                    const NeverScrollableScrollPhysics(),
-                                scrollable: true,
-                                expands: false,
-                                maxHeight: 150,
                                 scrollController:
                                     ScrollController(keepScrollOffset: false),
                                 controller: controller,
                                 focusNode: FocusNode(),
+                                config: const quill.QuillEditorConfig(
+                                  padding: EdgeInsets.only(bottom: 10),
+                                  autoFocus: true,
+                                  enableInteractiveSelection: false,
+                                  showCursor: false,
+                                  scrollPhysics:
+                                      NeverScrollableScrollPhysics(),
+                                  expands: false,
+                                  maxHeight: 150,
+                                ),
                               ),
                             ),
                             Row(
                               children: [
                                 Text(
-                                    Jiffy(DateTime.parse(
-                                            myData['date'].toDate().toString()))
+                                        Jiffy.parseFromDateTime(
+                                          myData['date'].toDate())
                                         .MMMd
                                         .toString(),
                                     style: GoogleFonts.roboto(

@@ -32,9 +32,13 @@ class FirestoreService {
         return 'No internet connection';
       }
       await _firestore.collection(userUid).doc(uid).set(note.toJson());
-      await firestoreFolder.addDocToFolder(folderField: folder, noteUid: uid);
+      final folderError = await firestoreFolder.addDocToFolder(
+          folderField: folder, noteUid: uid);
+      if (folderError != null) {
+        return folderError;
+      }
     } on FirebaseException catch (e) {
-      return e.message!;
+      return e.message ?? 'Firebase error: ${e.code}';
     }
     return null;
   }
@@ -67,7 +71,7 @@ class FirestoreService {
           noteUid: noteUid,
           previousFolder: previousFolder);
     } on FirebaseException catch (e) {
-      return e.message!;
+      return e.message ?? 'Firebase error: ${e.code}';
     }
 
     return null;
