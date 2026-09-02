@@ -109,6 +109,7 @@ class EditNoteState extends ConsumerState<EditNote> {
                           editor.QuillSimpleToolbar(
                             controller: _controller,
                             config: editor.QuillSimpleToolbarConfig(
+                              color: Theme.of(context).cardColor,
                               multiRowsDisplay: false,
                               showIndent: true,
                               dialogTheme: editor.QuillDialogTheme(

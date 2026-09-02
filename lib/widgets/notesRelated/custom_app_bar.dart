@@ -22,6 +22,8 @@ class CustomAppBar extends StatelessWidget {
               backgroundColor: WidgetStateProperty.all<Color>(
                 const Color.fromARGB(255, 57, 56, 78),
               ),
+              foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
+              padding: WidgetStateProperty.all<EdgeInsets>(EdgeInsets.zero),
             ),
             onPressed: () {
               Navigator.of(context).pop();
@@ -43,6 +45,8 @@ class CustomAppBar extends StatelessWidget {
               backgroundColor: WidgetStateProperty.all<Color>(
                 const Color.fromARGB(255, 57, 56, 78),
               ),
+              foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
+              padding: WidgetStateProperty.all<EdgeInsets>(EdgeInsets.zero),
             ),
             onPressed: onPressed,
             child: const Text('Save'),

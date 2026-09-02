@@ -84,6 +84,7 @@ class _CreateNoteState extends State<CreateNote> {
                   editor.QuillSimpleToolbar(
                     controller: _controller,
                     config: editor.QuillSimpleToolbarConfig(
+                      color: Theme.of(context).cardColor,
                       multiRowsDisplay: false,
                       showIndent: true,
                       dialogTheme: editor.QuillDialogTheme(

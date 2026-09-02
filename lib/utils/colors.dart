@@ -30,6 +30,9 @@ class CustomTheme {
         ),
       ),
       hintColor: const Color.fromARGB(255, 187, 187, 242),
+      inputDecorationTheme: const InputDecorationThemeData(
+        hintStyle: TextStyle(color: Color.fromARGB(255, 187, 187, 242)),
+      ),
       textTheme: const TextTheme(bodyMedium: TextStyle(color: Colors.white)),
       cardColor: const Color.fromRGBO(39, 38, 53, 1), //color of the container
       scaffoldBackgroundColor: const Color.fromRGBO(
