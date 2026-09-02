@@ -5,6 +5,7 @@ class CustomTheme {
   static ThemeData get darkTheme {
     return ThemeData(
       dialogTheme: DialogThemeData(
+        backgroundColor: const Color.fromRGBO(31, 29, 43, 1),
         contentTextStyle: GoogleFonts.ubuntu(color: Colors.white, fontSize: 16),
         titleTextStyle: GoogleFonts.ubuntu(
           color: Colors.white,
