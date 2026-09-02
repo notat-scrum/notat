@@ -7,7 +7,7 @@ on:
 
 jobs:
   verificacao:
-    name: Análise, testes e build
+    name: Formatação, análise e testes
     runs-on: ubuntu-latest
 
     steps:
@@ -40,6 +40,3 @@ jobs:
 
       - name: Testes
         run: flutter test
-
-      - name: Build do APK de debug
-        run: flutter build apk --debug
