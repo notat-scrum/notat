@@ -19,9 +19,24 @@ class FolderMenu extends ConsumerWidget {
 
             return TextButton(
               onPressed: () {
+                // RelativeRect.fill ancorava o menu no canto superior esquerdo
+                // da tela, longe do botao que o abriu
+                final botao = context.findRenderObject()! as RenderBox;
+                final overlay =
+                    Overlay.of(context).context.findRenderObject()!
+                        as RenderBox;
                 showMenu(
                   context: context,
-                  position: RelativeRect.fill,
+                  position: RelativeRect.fromRect(
+                    Rect.fromPoints(
+                      botao.localToGlobal(Offset.zero, ancestor: overlay),
+                      botao.localToGlobal(
+                        botao.size.bottomRight(Offset.zero),
+                        ancestor: overlay,
+                      ),
+                    ),
+                    Offset.zero & overlay.size,
+                  ),
                   items: List.generate(
                     keys.length,
                     (index) => PopupMenuItem(
