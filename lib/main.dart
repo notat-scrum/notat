@@ -1,8 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:notat/firebase_options.dart';
 import 'package:notat/screens/authentication/login_screen.dart';
-import 'package:notat/screens/errorAndLoading/error_screen.dart';
 import 'package:notat/screens/authentication/signup_screen.dart';
+import 'package:notat/screens/errorAndLoading/error_screen.dart';
 import 'package:notat/screens/functionalities/home_page.dart';
 import 'package:notat/screens/wrapper.dart';
 import 'package:notat/utils/colors.dart';
@@ -10,7 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   ErrorWidget.builder = (details) => const ErrorPage();
   runApp(const ProviderScope(child: MyApp()));
 }
