@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:device_preview/device_preview.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -18,9 +17,7 @@ Future<void> main() async {
     FlutterError.presentError(details);
     if (kReleaseMode) exit(1);
   };
-  runApp(ProviderScope(
-      child: DevicePreview(
-          enabled: !kReleaseMode, builder: ((context) => MyApp()))));
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -29,10 +26,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      useInheritedMediaQuery: true,
-      locale: DevicePreview.locale(context),
       debugShowCheckedModeBanner: false,
-      builder: DevicePreview.appBuilder,
       theme: CustomTheme.DarkTheme,
       home: const Wrapper(),
       routes: {
