@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_again/resources/firestore_methods.dart';
-import 'package:flutter_application_again/widgets/notesRelated/note_cards.dart';
+import 'package:notat/resources/firestore_methods.dart';
+import 'package:notat/widgets/notesRelated/note_cards.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 Future<dynamic> foldersBottomSheet(BuildContext context, String folder) {

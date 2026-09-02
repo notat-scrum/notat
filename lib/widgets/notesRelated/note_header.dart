@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_again/widgets/foldersRelated/folder_menu.dart';
+import 'package:notat/widgets/foldersRelated/folder_menu.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jiffy/jiffy.dart';
 

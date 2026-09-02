@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_again/providers/folders_provider.dart';
-import 'package:flutter_application_again/screens/errorAndLoading/loading_screen.dart';
+import 'package:notat/providers/folders_provider.dart';
+import 'package:notat/screens/errorAndLoading/loading_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 

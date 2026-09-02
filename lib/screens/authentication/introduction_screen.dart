@@ -1,9 +1,9 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_again/screens/authentication/login_screen.dart';
-import 'package:flutter_application_again/screens/authentication/signup_screen.dart';
-import 'package:flutter_application_again/widgets/reusedComponents/animation_transition.dart';
-import 'package:flutter_application_again/widgets/reusedComponents/sign_button.dart';
+import 'package:notat/screens/authentication/login_screen.dart';
+import 'package:notat/screens/authentication/signup_screen.dart';
+import 'package:notat/widgets/reusedComponents/animation_transition.dart';
+import 'package:notat/widgets/reusedComponents/sign_button.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class IntroductionScreen extends StatelessWidget {

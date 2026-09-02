@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_again/resources/auth_methods.dart';
-import 'package:flutter_application_again/resources/firestore_methods.dart';
-import 'package:flutter_application_again/screens/authentication/introduction_screen.dart';
-import 'package:flutter_application_again/screens/functionalities/create_note.dart';
-import 'package:flutter_application_again/widgets/delete_account_dialog.dart';
-import 'package:flutter_application_again/widgets/reusedComponents/animation_transition.dart';
-import 'package:flutter_application_again/widgets/foldersRelated/folders._tab.dart';
-import 'package:flutter_application_again/widgets/notesRelated/notes_tab.dart';
-import 'package:flutter_application_again/widgets/reusedComponents/snackbar.dart';
+import 'package:notat/resources/auth_methods.dart';
+import 'package:notat/resources/firestore_methods.dart';
+import 'package:notat/screens/authentication/introduction_screen.dart';
+import 'package:notat/screens/functionalities/create_note.dart';
+import 'package:notat/widgets/delete_account_dialog.dart';
+import 'package:notat/widgets/reusedComponents/animation_transition.dart';
+import 'package:notat/widgets/foldersRelated/folders._tab.dart';
+import 'package:notat/widgets/notesRelated/notes_tab.dart';
+import 'package:notat/widgets/reusedComponents/snackbar.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class HomePage extends StatefulWidget {

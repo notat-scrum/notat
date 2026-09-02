@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_application_again/models/note.dart';
-import 'package:flutter_application_again/resources/auth_methods.dart';
-import 'package:flutter_application_again/resources/firstore_folder_methods.dart';
-import 'package:flutter_application_again/resources/internet_connection.dart';
+import 'package:notat/models/note.dart';
+import 'package:notat/resources/auth_methods.dart';
+import 'package:notat/resources/firstore_folder_methods.dart';
+import 'package:notat/resources/internet_connection.dart';
 import 'package:uuid/uuid.dart';
 
 class FirestoreService {

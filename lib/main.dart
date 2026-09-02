@@ -1,11 +1,11 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_again/screens/authentication/login_screen.dart';
-import 'package:flutter_application_again/screens/errorAndLoading/error_screen.dart';
-import 'package:flutter_application_again/screens/authentication/signup_screen.dart';
-import 'package:flutter_application_again/screens/functionalities/home_page.dart';
-import 'package:flutter_application_again/screens/wrapper.dart';
-import 'package:flutter_application_again/utils/colors.dart';
+import 'package:notat/screens/authentication/login_screen.dart';
+import 'package:notat/screens/errorAndLoading/error_screen.dart';
+import 'package:notat/screens/authentication/signup_screen.dart';
+import 'package:notat/screens/functionalities/home_page.dart';
+import 'package:notat/screens/wrapper.dart';
+import 'package:notat/utils/colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 Future<void> main() async {

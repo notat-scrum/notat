@@ -1,12 +1,12 @@
 import 'dart:convert';
 
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:flutter_application_again/resources/firestore_methods.dart';
-import 'package:flutter_application_again/screens/errorAndLoading/error_screen.dart';
-import 'package:flutter_application_again/screens/functionalities/edit_note.dart';
-import 'package:flutter_application_again/screens/errorAndLoading/empty_result.dart';
-import 'package:flutter_application_again/screens/errorAndLoading/loading_screen.dart';
-import 'package:flutter_application_again/widgets/reusedComponents/animation_transition.dart';
+import 'package:notat/resources/firestore_methods.dart';
+import 'package:notat/screens/errorAndLoading/error_screen.dart';
+import 'package:notat/screens/functionalities/edit_note.dart';
+import 'package:notat/screens/errorAndLoading/empty_result.dart';
+import 'package:notat/screens/errorAndLoading/loading_screen.dart';
+import 'package:notat/widgets/reusedComponents/animation_transition.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';

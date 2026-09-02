@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_application_again/resources/firestore_methods.dart';
-import 'package:flutter_application_again/resources/firstore_folder_methods.dart';
+import 'package:notat/resources/firestore_methods.dart';
+import 'package:notat/resources/firstore_folder_methods.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;

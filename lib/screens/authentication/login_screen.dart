@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_again/resources/auth_methods.dart';
-import 'package:flutter_application_again/resources/internet_connection.dart';
-import 'package:flutter_application_again/screens/authentication/forgot_password.dart';
-import 'package:flutter_application_again/screens/functionalities/home_page.dart';
-import 'package:flutter_application_again/screens/authentication/verify_email_screen.dart';
-import 'package:flutter_application_again/utils/regex.dart';
-import 'package:flutter_application_again/widgets/reusedComponents/animation_transition.dart';
-import 'package:flutter_application_again/widgets/reusedComponents/input_text_field.dart';
-import 'package:flutter_application_again/widgets/reusedComponents/sign_button.dart';
-import 'package:flutter_application_again/widgets/reusedComponents/snackbar.dart';
+import 'package:notat/resources/auth_methods.dart';
+import 'package:notat/resources/internet_connection.dart';
+import 'package:notat/screens/authentication/forgot_password.dart';
+import 'package:notat/screens/functionalities/home_page.dart';
+import 'package:notat/screens/authentication/verify_email_screen.dart';
+import 'package:notat/utils/regex.dart';
+import 'package:notat/widgets/reusedComponents/animation_transition.dart';
+import 'package:notat/widgets/reusedComponents/input_text_field.dart';
+import 'package:notat/widgets/reusedComponents/sign_button.dart';
+import 'package:notat/widgets/reusedComponents/snackbar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 

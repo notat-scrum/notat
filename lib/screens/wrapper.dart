@@ -1,10 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_again/resources/auth_methods.dart';
-import 'package:flutter_application_again/screens/authentication/introduction_screen.dart';
-import 'package:flutter_application_again/screens/errorAndLoading/error_screen.dart';
-import 'package:flutter_application_again/screens/functionalities/home_page.dart';
-import 'package:flutter_application_again/screens/errorAndLoading/loading_screen.dart';
+import 'package:notat/resources/auth_methods.dart';
+import 'package:notat/screens/authentication/introduction_screen.dart';
+import 'package:notat/screens/errorAndLoading/error_screen.dart';
+import 'package:notat/screens/functionalities/home_page.dart';
+import 'package:notat/screens/errorAndLoading/loading_screen.dart';
 
 class Wrapper extends StatelessWidget {
   const Wrapper({super.key});

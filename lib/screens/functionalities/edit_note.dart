@@ -1,12 +1,12 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_application_again/resources/firestore_methods.dart';
-import 'package:flutter_application_again/screens/errorAndLoading/error_screen.dart';
-import 'package:flutter_application_again/screens/errorAndLoading/loading_screen.dart';
-import 'package:flutter_application_again/widgets/notesRelated/custom_app_bar.dart';
-import 'package:flutter_application_again/widgets/notesRelated/note_header.dart';
-import 'package:flutter_application_again/widgets/reusedComponents/snackbar.dart';
+import 'package:notat/resources/firestore_methods.dart';
+import 'package:notat/screens/errorAndLoading/error_screen.dart';
+import 'package:notat/screens/errorAndLoading/loading_screen.dart';
+import 'package:notat/widgets/notesRelated/custom_app_bar.dart';
+import 'package:notat/widgets/notesRelated/note_header.dart';
+import 'package:notat/widgets/reusedComponents/snackbar.dart';
 import 'package:flutter_quill/flutter_quill.dart' as editor;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

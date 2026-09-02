@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_again/resources/auth_methods.dart';
-import 'package:flutter_application_again/screens/functionalities/home_page.dart';
-import 'package:flutter_application_again/widgets/reusedComponents/animation_transition.dart';
-import 'package:flutter_application_again/widgets/reusedComponents/sign_button.dart';
+import 'package:notat/resources/auth_methods.dart';
+import 'package:notat/screens/functionalities/home_page.dart';
+import 'package:notat/widgets/reusedComponents/animation_transition.dart';
+import 'package:notat/widgets/reusedComponents/sign_button.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 

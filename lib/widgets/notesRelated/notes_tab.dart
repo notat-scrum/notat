@@ -1,6 +1,6 @@
-import 'package:flutter_application_again/providers/note_provider.dart';
+import 'package:notat/providers/note_provider.dart';
 
-import 'package:flutter_application_again/widgets/notesRelated/note_cards.dart';
+import 'package:notat/widgets/notesRelated/note_cards.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

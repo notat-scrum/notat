@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_application_again/resources/auth_methods.dart';
-import 'package:flutter_application_again/resources/firestore_methods.dart';
-import 'package:flutter_application_again/resources/internet_connection.dart';
+import 'package:notat/resources/auth_methods.dart';
+import 'package:notat/resources/firestore_methods.dart';
+import 'package:notat/resources/internet_connection.dart';
 
 class FirestoreFolderService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;

@@ -1,12 +1,12 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
-import 'package:flutter_application_again/widgets/reusedComponents/snackbar.dart';
+import 'package:notat/widgets/reusedComponents/snackbar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:flutter_application_again/resources/auth_methods.dart';
-import 'package:flutter_application_again/utils/regex.dart';
-import 'package:flutter_application_again/widgets/reusedComponents/input_text_field.dart';
-import 'package:flutter_application_again/widgets/reusedComponents/sign_button.dart';
+import 'package:notat/resources/auth_methods.dart';
+import 'package:notat/utils/regex.dart';
+import 'package:notat/widgets/reusedComponents/input_text_field.dart';
+import 'package:notat/widgets/reusedComponents/sign_button.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});

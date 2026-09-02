@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_again/providers/folders_provider.dart';
-import 'package:flutter_application_again/resources/firstore_folder_methods.dart';
-import 'package:flutter_application_again/screens/errorAndLoading/error_screen.dart';
-import 'package:flutter_application_again/screens/errorAndLoading/loading_screen.dart';
-import 'package:flutter_application_again/widgets/foldersRelated/folder_dialog.dart';
-import 'package:flutter_application_again/widgets/notesRelated/notes_inside_folder.dart';
+import 'package:notat/providers/folders_provider.dart';
+import 'package:notat/resources/firstore_folder_methods.dart';
+import 'package:notat/screens/errorAndLoading/error_screen.dart';
+import 'package:notat/screens/errorAndLoading/loading_screen.dart';
+import 'package:notat/widgets/foldersRelated/folder_dialog.dart';
+import 'package:notat/widgets/notesRelated/notes_inside_folder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
