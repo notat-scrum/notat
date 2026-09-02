@@ -56,15 +56,16 @@ class DeleteAccountDialog extends StatelessWidget {
           onPressed: () async {
             if (_key.currentState!.validate() == true) {
               await auth.reloadUser();
-              await auth.reauthentication(_controller.text).then((value) async {
-                if (value != null) {
-                  CustomSnackBar.show(context, value, Duration(seconds: 3));
-                } else {
-                  await auth.deleteAccount();
-                  FadeTrans(translateTo: IntroductionScreen());
-                }
-                Navigator.pop(context);
-              });
+              final erro = await auth.reauthentication(_controller.text);
+              if (!context.mounted) return;
+              if (erro != null) {
+                CustomSnackBar.show(context, erro, Duration(seconds: 3));
+              } else {
+                await auth.deleteAccount();
+                if (!context.mounted) return;
+                FadeTrans(translateTo: IntroductionScreen());
+              }
+              Navigator.pop(context);
             }
           },
           child: Text('Delete Account', style: TextStyle(color: Colors.red)),

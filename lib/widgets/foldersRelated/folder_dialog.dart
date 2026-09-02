@@ -30,13 +30,13 @@ class FolderDialog extends StatelessWidget {
         TextButton(
           onPressed: () async {
             if (formKey.currentState!.validate() == true) {
-              await FirestoreFolderService()
-                  .createFolder(folderController.text)
-                  .then((value) {
-                    if (value != null) {
-                      CustomSnackBar.show(context, value, Duration(seconds: 2));
-                    }
-                  });
+              final erro = await FirestoreFolderService().createFolder(
+                folderController.text,
+              );
+              if (!context.mounted) return;
+              if (erro != null) {
+                CustomSnackBar.show(context, erro, Duration(seconds: 2));
+              }
             }
             Navigator.of(context).pop();
             folderController.clear();

@@ -45,6 +45,7 @@ class _VerifyEmailState extends State<VerifyEmail> {
 
   Future<void> checkVerification() async {
     await FirebaseAuth.instance.currentUser?.reload();
+    if (!mounted) return;
     final user = FirebaseAuth.instance.currentUser;
     if (user?.emailVerified ?? false) {
       Navigator.of(

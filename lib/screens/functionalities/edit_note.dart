@@ -65,7 +65,7 @@ class EditNoteState extends ConsumerState<EditNote> {
                               String plainText = jsonEncode(
                                 _controller.document.toPlainText(),
                               );
-                              await FirestoreService()
+                              final erro = await FirestoreService()
                                   .updateDocument(
                                     previousFolder: previousFolder,
                                     folder: selected.value,
@@ -74,17 +74,16 @@ class EditNoteState extends ConsumerState<EditNote> {
                                     title: _titleController.text,
                                     noteUid: widget.noteUid,
                                     date: DateTime.now(),
-                                  )
-                                  .then((value) {
-                                    if (value != null) {
-                                      CustomSnackBar.show(
-                                        context,
-                                        value,
-                                        Duration(seconds: 2),
-                                      );
-                                    }
-                                    Navigator.of(context).pop();
-                                  });
+                                  );
+                              if (!context.mounted) return;
+                              if (erro != null) {
+                                CustomSnackBar.show(
+                                  context,
+                                  erro,
+                                  Duration(seconds: 2),
+                                );
+                              }
+                              Navigator.of(context).pop();
                             },
                           ),
                           NoteHeader(

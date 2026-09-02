@@ -94,16 +94,16 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 isRounded: true,
                 onTap: () async {
                   if (_key.currentState!.validate() == true) {
-                    await AuthService().restPassword(_controller.text).then((
-                      value,
-                    ) {
-                      Navigator.of(context).pop();
-                      CustomSnackBar.show(
-                        context,
-                        value ?? 'Rest email sent successfully, check your inbox/spam!',
-                        Duration(seconds: 3),
-                      );
-                    });
+                    final erro = await AuthService().restPassword(
+                      _controller.text,
+                    );
+                    if (!context.mounted) return;
+                    Navigator.of(context).pop();
+                    CustomSnackBar.show(
+                      context,
+                      erro ?? 'Rest email sent successfully, check your inbox/spam!',
+                      Duration(seconds: 3),
+                    );
                   }
                 },
                 child: const Text('Send Rest Email'),

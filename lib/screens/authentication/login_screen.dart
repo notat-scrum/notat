@@ -83,6 +83,7 @@ class _LoginDetailsState extends State<LoginDetails> {
         email: emailController.text,
         password: passwordController.text,
       );
+      if (!mounted) return;
 
       if (auth == null) {
         //check if login is successful
@@ -180,6 +181,7 @@ class _LoginDetailsState extends State<LoginDetails> {
                 child: TextButton(
                   onPressed: () async {
                     final internet = await Connection.checkInternet();
+                    if (!context.mounted) return;
                     if (internet) {
                       forgotPassBottomSheet(context);
                     } else {

@@ -5,9 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class FolderMenu extends ConsumerWidget {
-  FolderMenu({super.key, required this.selected});
+  const FolderMenu({super.key, required this.selected});
 
-  ValueNotifier<String?> selected;
+  final ValueNotifier<String?> selected;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ref

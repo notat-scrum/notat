@@ -44,24 +44,22 @@ class _CreateNoteState extends State<CreateNote> {
                       String plainText = jsonEncode(
                         _controller.document.toPlainText(),
                       );
-                      await FirestoreService()
-                          .addDocument(
-                            document: json,
-                            searchableDocument: plainText,
-                            title: _titleController.text,
-                            folder: selected.value,
-                            date: DateTime.now(),
-                          )
-                          .then((value) {
-                            if (value != null) {
-                              CustomSnackBar.show(
-                                context,
-                                value,
-                                Duration(seconds: 2),
-                              );
-                            }
-                            Navigator.pop(context);
-                          });
+                      final erro = await FirestoreService().addDocument(
+                        document: json,
+                        searchableDocument: plainText,
+                        title: _titleController.text,
+                        folder: selected.value,
+                        date: DateTime.now(),
+                      );
+                      if (!context.mounted) return;
+                      if (erro != null) {
+                        CustomSnackBar.show(
+                          context,
+                          erro,
+                          Duration(seconds: 2),
+                        );
+                      }
+                      Navigator.pop(context);
                     },
                   ),
                   NoteHeader(

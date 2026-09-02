@@ -72,15 +72,15 @@ class _HomePageState extends State<HomePage>
                     PopupMenuItem(
                       onTap: () async {
                         await AuthService().reloadUser();
-                        await AuthService().signOut().then((value) {
-                          if (value != null) {
-                            CustomSnackBar.show(
-                              context,
-                              value,
-                              Duration(seconds: 2),
-                            );
-                          }
-                        });
+                        final erro = await AuthService().signOut();
+                        if (!context.mounted) return;
+                        if (erro != null) {
+                          CustomSnackBar.show(
+                            context,
+                            erro,
+                            Duration(seconds: 2),
+                          );
+                        }
                         FadeTrans(translateTo: IntroductionScreen());
                       },
                       value: 2,
