@@ -1,9 +1,10 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_application_again/resources/firestore_methods.dart';
-import 'package:flutter_application_again/widgets/notesRelated/custom_app_bar.dart';
-import 'package:flutter_application_again/widgets/notesRelated/note_header.dart';
-import 'package:flutter_application_again/widgets/reusedComponents/snackbar.dart';
+import 'package:notat/resources/firestore_methods.dart';
+import 'package:notat/widgets/notesRelated/custom_app_bar.dart';
+import 'package:notat/widgets/notesRelated/note_header.dart';
+import 'package:notat/widgets/reusedComponents/snackbar.dart';
 import 'package:flutter_quill/flutter_quill.dart' as editor;
 
 class CreateNote extends StatefulWidget {
@@ -28,73 +29,86 @@ class _CreateNoteState extends State<CreateNote> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: Scaffold(
-      body: CustomScrollView(
-        physics: NeverScrollableScrollPhysics(),
-        slivers: [
-          SliverFillRemaining(
+      child: Scaffold(
+        body: CustomScrollView(
+          physics: NeverScrollableScrollPhysics(),
+          slivers: [
+            SliverFillRemaining(
               child: Column(
-            children: [
-              CustomAppBar(onPressed: () async {
-                String json =
-                    jsonEncode(_controller.document.toDelta().toJson());
-                String plainText =
-                    jsonEncode(_controller.document.toPlainText());
-                await FirestoreService()
-                    .addDocument(
+                children: [
+                  CustomAppBar(
+                    onPressed: () async {
+                      String json = jsonEncode(
+                        _controller.document.toDelta().toJson(),
+                      );
+                      String plainText = jsonEncode(
+                        _controller.document.toPlainText(),
+                      );
+                      final erro = await FirestoreService().addDocument(
                         document: json,
                         searchableDocument: plainText,
                         title: _titleController.text,
                         folder: selected.value,
-                        date: DateTime.now())
-                    .then((value) {
-                  if (value != null) {
-                    CustomSnackBar.show(
-                        context, '$value', Duration(seconds: 2));
-                  }
-                  Navigator.pop(context);
-                });
-              }),
-              NoteHeader(
-                  editNoteMod: false,
-                  titleController: _titleController,
-                  selected: selected,
-                  snapshot: null),
-              Expanded(
-                child: editor.QuillEditor(
-                    focusNode: FocusNode(),
-                    scrollable: true,
-                    autoFocus: false,
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    scrollController: ScrollController(),
-                    expands: true,
+                        date: DateTime.now(),
+                      );
+                      if (!context.mounted) return;
+                      if (erro != null) {
+                        CustomSnackBar.show(
+                          context,
+                          erro,
+                          Duration(seconds: 2),
+                        );
+                      }
+                      Navigator.pop(context);
+                    },
+                  ),
+                  NoteHeader(
+                    editNoteMod: false,
+                    titleController: _titleController,
+                    selected: selected,
+                    snapshot: null,
+                  ),
+                  Expanded(
+                    child: editor.QuillEditor(
+                      focusNode: FocusNode(),
+                      scrollController: ScrollController(),
+                      controller: _controller,
+                      config: editor.QuillEditorConfig(
+                        scrollable: true,
+                        autoFocus: false,
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        expands: true,
+                      ),
+                    ),
+                  ),
+                  editor.QuillSimpleToolbar(
                     controller: _controller,
-                    readOnly: false),
+                    config: editor.QuillSimpleToolbarConfig(
+                      color: Theme.of(context).cardColor,
+                      multiRowsDisplay: false,
+                      showIndent: true,
+                      dialogTheme: editor.QuillDialogTheme(
+                        inputTextStyle: TextStyle(color: Colors.white),
+                        labelTextStyle: TextStyle(color: Colors.white),
+                      ),
+                      showLink: true,
+                      showDirection: false,
+                      showBackgroundColorButton: false,
+                      showRedo: true,
+                      showSearchButton: true,
+                      showFontSize: false,
+                      showAlignmentButtons: true,
+                      showCodeBlock: true,
+                      showFontFamily: false,
+                      showInlineCode: false,
+                    ),
+                  ),
+                ],
               ),
-              editor.QuillToolbar.basic(
-                controller: _controller,
-                multiRowsDisplay: false,
-                showIndent: true,
-                showImageButton: false,
-                dialogTheme: editor.QuillDialogTheme(
-                    inputTextStyle: TextStyle(color: Colors.white),
-                    labelTextStyle: TextStyle(color: Colors.white)),
-                showLink: true,
-                showDirection: false,
-                showBackgroundColorButton: false,
-                showRedo: true,
-                showSearchButton: true,
-                showFontSize: false,
-                showAlignmentButtons: true,
-                showCodeBlock: true,
-                showFontFamily: false,
-                showInlineCode: false,
-                showVideoButton: false,
-              )
-            ],
-          ))
-        ],
+            ),
+          ],
+        ),
       ),
-    ));
+    );
   }
 }

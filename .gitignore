@@ -46,6 +46,9 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-#google service
-google-services.json
-android/app/google-services.json
+# google-services.json e firebase_options.dart sao versionados de proposito:
+# nao sao segredo, e sim identificadores publicos do projeto. O controle de
+# acesso real sao as Security Rules. Ver README.
+
+# FVM
+.fvm/

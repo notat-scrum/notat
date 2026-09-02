@@ -1,5 +1,5 @@
-name: flutter_application_again
-description: A new Flutter project.
+name: notat
+description: Aplicativo de notas com editor rich text e organização em pastas.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -18,7 +18,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.17.6 <3.0.0"
+  sdk: ^3.13.0
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -29,52 +29,42 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  firebase_storage: ^10.3.4
-  cloud_firestore: ^3.4.2
-  firebase_auth: ^3.6.1
-  firebase_core: ^1.20.0
+  flutter_localizations:
+    sdk: flutter
+  cloud_firestore: ^6.9.0
+  firebase_auth: ^6.6.1
+  firebase_core: ^4.14.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  firebase_messaging: ^12.0.1
-  uuid: ^3.0.6
-  flutter_staggered_grid_view: ^0.6.2
+  uuid: ^4.6.0
+  flutter_staggered_grid_view: ^0.7.0
   auto_size_text: ^3.0.0
-  tab_indicator_styler: ^2.0.0
-  flutter_quill: ^5.4.1
+  flutter_quill: ^11.0.0
   loading_animation_widget: ^1.2.0+2
-  google_fonts: ^3.0.1
-  animated_text_kit: ^4.2.2
-  lottie: ^1.4.1
-  custom_timer: ^0.1.2
-  jiffy: ^5.0.0
+  google_fonts: ^8.2.1
+  animated_text_kit: ^4.3.0
+  lottie: ^3.5.1
+  jiffy: ^6.4.5
   focused_menu: ^1.0.5
   flutter_riverpod: ^1.0.4
-  connectivity_plus: ^2.3.9
-  device_preview: ^1.1.0
+  connectivity_plus: ^7.3.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_launcher_icons: ^0.9.2
-  flutter_native_splash: ^2.0.1+1
+  flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.8
+  flutter_lints: ^6.0.0
 
 flutter_native_splash:
   color: "#1f1d2b"
   image: "assets/splashScreen.png"
 
-flutter_icons:
+flutter_launcher_icons:
   android: true
-  ios: true
   image_path: "assets/logo.png"
-
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
-  flutter_lints: ^2.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

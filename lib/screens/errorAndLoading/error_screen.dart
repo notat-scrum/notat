@@ -10,23 +10,21 @@ class ErrorPage extends StatelessWidget {
       body: Center(
         child: ListView(
           children: [
-            SizedBox(
-              height: 150,
-            ),
+            SizedBox(height: 150),
             Text(
               'Something went wrong',
               textAlign: TextAlign.center,
               style: GoogleFonts.quicksand(
-                  fontSize: 28, fontWeight: FontWeight.w600),
+                fontSize: 28,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            SizedBox(
-              height: 30,
-            ),
+            SizedBox(height: 30),
             Icon(
               Icons.error_outline_outlined,
               color: Colors.white70,
               size: 120,
-            )
+            ),
           ],
         ),
       ),
