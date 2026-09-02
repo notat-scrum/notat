@@ -1,4 +1,4 @@
-package com.example.flutter_application_again
+package br.com.notat.app
 
 import io.flutter.embedding.android.FlutterActivity
 
