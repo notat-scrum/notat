@@ -139,10 +139,9 @@ class _NoteCardsState extends State<NoteCards> {
                             Row(
                               children: [
                                 Text(
-                                    Jiffy(DateTime.parse(
-                                            myData['date'].toDate().toString()))
-                                        .MMMd
-                                        .toString(),
+                                    Jiffy.parseFromDateTime(
+                                            myData['date'].toDate())
+                                        .MMMd,
                                     style: GoogleFonts.roboto(
                                       fontSize: 12,
                                       color: const Color.fromARGB(
