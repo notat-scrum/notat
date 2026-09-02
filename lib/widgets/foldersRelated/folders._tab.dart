@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_application_again/providers/folders_provider.dart';
 import 'package:flutter_application_again/resources/firstore_folder_methods.dart';
@@ -38,10 +36,10 @@ class _FoldersTabState extends State<FoldersTab> {
             final streamProv = ref.watch(folderProvider);
             return streamProv.when(
               data: ((snapshot) {
-                if (snapshot.data() == null) {
-                  exit(0);
+                final data = snapshot.data();
+                if (data == null) {
+                  return const ErrorPage();
                 }
-                final data = snapshot.data()!;
                 final keys = data.keys.toList();
                 return GridView.builder(
                   physics: BouncingScrollPhysics(),

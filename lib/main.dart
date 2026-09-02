@@ -1,9 +1,7 @@
-import 'dart:io';
-
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_again/screens/authentication/login_screen.dart';
+import 'package:flutter_application_again/screens/errorAndLoading/error_screen.dart';
 import 'package:flutter_application_again/screens/authentication/signup_screen.dart';
 import 'package:flutter_application_again/screens/functionalities/home_page.dart';
 import 'package:flutter_application_again/screens/wrapper.dart';
@@ -13,11 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  FlutterError.onError = (details) {
-    //whenever there's an error, exit the app
-    FlutterError.presentError(details);
-    if (kReleaseMode) exit(1);
-  };
+  ErrorWidget.builder = (details) => const ErrorPage();
   runApp(const ProviderScope(child: MyApp()));
 }
 
