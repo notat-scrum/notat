@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:custom_timer/custom_timer.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_again/resources/auth_methods.dart';
@@ -11,13 +11,15 @@ import 'package:lottie/lottie.dart';
 
 Future<dynamic> CustomBottomSheet(BuildContext context) {
   return showModalBottomSheet<dynamic>(
-      isScrollControlled: true,
-      enableDrag: false,
-      isDismissible: false,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(150))),
-      context: context,
-      builder: (BuildContext _) => const VerifyEmail());
+    isScrollControlled: true,
+    enableDrag: false,
+    isDismissible: false,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(150)),
+    ),
+    context: context,
+    builder: (BuildContext _) => const VerifyEmail(),
+  );
 }
 
 class VerifyEmail extends StatefulWidget {
@@ -28,7 +30,10 @@ class VerifyEmail extends StatefulWidget {
 }
 
 class _VerifyEmailState extends State<VerifyEmail> {
-  late CustomTimerController _controller;
+  static const _duracaoInicial = Duration(minutes: 2);
+
+  Duration _restante = _duracaoInicial;
+  Timer? _contagem;
   bool isDismised = true;
   late Timer timer;
 
@@ -42,9 +47,10 @@ class _VerifyEmailState extends State<VerifyEmail> {
     await FirebaseAuth.instance.currentUser?.reload();
     final user = FirebaseAuth.instance.currentUser;
     if (user?.emailVerified ?? false) {
-      Navigator.of(context, rootNavigator: true)
-          .pushReplacementNamed('Home page')
-          .then((value) {
+      Navigator.of(
+        context,
+        rootNavigator: true,
+      ).pushReplacementNamed('Home page').then((value) {
         disposeScreen();
       });
     }
@@ -55,8 +61,8 @@ class _VerifyEmailState extends State<VerifyEmail> {
       Navigator.of(context)
           .pushReplacement(FadeTrans(translateTo: const HomePage()))
           .then((value) {
-        disposeScreen();
-      });
+            disposeScreen();
+          });
     } else {
       FirebaseAuth.instance.currentUser!.sendEmailVerification();
     }
@@ -65,24 +71,38 @@ class _VerifyEmailState extends State<VerifyEmail> {
   void disposeScreen() {
     if (!mounted) {
       print('disposed ---------');
-      @override
-      void dispose() {
-        _controller.dispose();
-        timer.cancel();
-        super.dispose();
-      }
     }
+  }
+
+  void _iniciarContagem() {
+    _contagem?.cancel();
+    setState(() => _restante = _duracaoInicial);
+    _contagem = Timer.periodic(const Duration(seconds: 1), (contagem) {
+      if (_restante.inSeconds <= 1) {
+        contagem.cancel();
+        setState(() => _restante = Duration.zero);
+        changeButtonState();
+      } else {
+        setState(() => _restante -= const Duration(seconds: 1));
+      }
+    });
   }
 
   @override
   void initState() {
-    _controller = CustomTimerController();
     sendEmailVerification();
-    _controller.start();
+    _iniciarContagem();
     timer = Timer.periodic(const Duration(seconds: 5), (timer) async {
       checkVerification();
     });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _contagem?.cancel();
+    timer.cancel();
+    super.dispose();
   }
 
   @override
@@ -91,25 +111,26 @@ class _VerifyEmailState extends State<VerifyEmail> {
       height: MediaQuery.of(context).size.height * 0.7,
       width: double.infinity,
       decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-          borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(45), topRight: Radius.circular(45))),
+        color: Theme.of(context).cardColor,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(45),
+          topRight: Radius.circular(45),
+        ),
+      ),
       alignment: Alignment.bottomCenter,
       child: Center(
         child: ListView(
           children: [
-            const SizedBox(
-              height: 50,
-            ),
+            const SizedBox(height: 50),
             Text(
               "Verify Email",
               textAlign: TextAlign.center,
               style: GoogleFonts.quicksand(
-                  fontSize: 35, fontWeight: FontWeight.bold),
+                fontSize: 35,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            const SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
             LottieBuilder.network(
               'https://assets8.lottiefiles.com/packages/lf20_dd9wpbrh.json',
               height: 300,
@@ -121,9 +142,7 @@ class _VerifyEmailState extends State<VerifyEmail> {
               style: GoogleFonts.quicksand(fontSize: 20),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(
-              height: 30,
-            ),
+            const SizedBox(height: 30),
             Container(
               padding: EdgeInsets.symmetric(horizontal: 30),
               height: 40,
@@ -138,34 +157,22 @@ class _VerifyEmailState extends State<VerifyEmail> {
                 onTap: () async {
                   changeButtonState();
                   sendEmailVerification();
-                  _controller.reset();
-                  _controller.start();
+                  _iniciarContagem();
                 },
                 child: const Text("Resend Email"),
               ),
             ),
-            const SizedBox(
-              height: 20,
-            ),
+            const SizedBox(height: 20),
             Padding(
               padding: EdgeInsets.only(top: 10, bottom: 20),
-              child: CustomTimer(
-                controller: _controller,
-                begin: const Duration(minutes: 2),
-                end: const Duration(),
-                builder: (time) {
-                  return Text(
-                    '${time.minutes}:${time.seconds}',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.quicksand(
-                        fontSize: 20, fontWeight: FontWeight.w500),
-                  );
-                },
-                onChangeState: (state) {
-                  if (state == CustomTimerState.finished) {
-                    changeButtonState();
-                  }
-                },
+              child: Text(
+                '${_restante.inMinutes.toString().padLeft(2, '0')}:'
+                '${(_restante.inSeconds % 60).toString().padLeft(2, '0')}',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.quicksand(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           ],
