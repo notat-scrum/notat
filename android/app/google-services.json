@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "126304190155",
+    "project_id": "notatmelhoria",
+    "storage_bucket": "notatmelhoria.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:126304190155:android:9e60ecde043246e058a54e",
+        "android_client_info": {
+          "package_name": "br.com.notat.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDzHYVUaOKoEAg_rt5teSShCuxGKVYUbpI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:126304190155:android:694189624f07591158a54e",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_again"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDzHYVUaOKoEAg_rt5teSShCuxGKVYUbpI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
