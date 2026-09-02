@@ -12,27 +12,23 @@ class EmptyResult extends StatelessWidget {
         child: ListView(
           physics: NeverScrollableScrollPhysics(),
           children: [
-            const SizedBox(
-              height: 100,
-            ),
+            const SizedBox(height: 100),
             Text(
               'Wow, such empty',
               textAlign: TextAlign.center,
               style: GoogleFonts.quicksand(fontSize: 25),
             ),
-            const SizedBox(
-              height: 50,
-            ),
+            const SizedBox(height: 50),
             LottieBuilder.asset("assets/51382-astronaut-light-theme.json"),
-            const SizedBox(
-              height: 50,
-            ),
+            const SizedBox(height: 50),
             Text(
               'Try Adding Something Interesting',
               textAlign: TextAlign.center,
               style: GoogleFonts.quicksand(
-                  fontSize: 27, fontWeight: FontWeight.w400),
-            )
+                fontSize: 27,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
           ],
         ),
       ),

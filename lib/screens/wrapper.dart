@@ -12,20 +12,21 @@ class Wrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: FirebaseAuth.instance.userChanges(),
-        builder: ((context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.active) {
-            if (snapshot.hasData) {
-              if (AuthService().isVerified) {
-                return HomePage();
-              } else if (snapshot.hasError) {
-                return ErrorPage();
-              }
+      stream: FirebaseAuth.instance.userChanges(),
+      builder: ((context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.active) {
+          if (snapshot.hasData) {
+            if (AuthService().isVerified) {
+              return HomePage();
+            } else if (snapshot.hasError) {
+              return ErrorPage();
             }
-          } else if (snapshot.connectionState == ConnectionState.waiting) {
-            return const LoadingScreen();
           }
-          return const IntroductionScreen();
-        }));
+        } else if (snapshot.connectionState == ConnectionState.waiting) {
+          return const LoadingScreen();
+        }
+        return const IntroductionScreen();
+      }),
+    );
   }
 }

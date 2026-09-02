@@ -56,7 +56,7 @@ class _CreateNoteState extends State<CreateNote> {
                             if (value != null) {
                               CustomSnackBar.show(
                                 context,
-                                '$value',
+                                value,
                                 Duration(seconds: 2),
                               );
                             }

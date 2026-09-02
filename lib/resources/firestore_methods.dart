@@ -10,22 +10,26 @@ class FirestoreService {
   final firestoreFolder = FirestoreFolderService();
   final userUid = AuthService().useUid;
 
-  Future<String?> addDocument(
-      {required String document,
-      required String title,
-      required String searchableDocument,
-      String folder = 'All',
-      required DateTime date}) async {
+  Future<String?> addDocument({
+    required String document,
+    required String title,
+    required String searchableDocument,
+    String folder = 'All',
+    required DateTime date,
+  }) async {
     final String uid = const Uuid().v4();
     final internet = await Connection.checkInternet();
     final Note note = Note(
-        folder: folder,
-        document: document,
-        searchableDocument:
-            searchableDocument.toLowerCase().replaceAll('\\n', ' '),
-        date: date,
-        uid: uid,
-        title: title.isNotEmpty ? title : 'untitled');
+      folder: folder,
+      document: document,
+      searchableDocument: searchableDocument.toLowerCase().replaceAll(
+        '\\n',
+        ' ',
+      ),
+      date: date,
+      uid: uid,
+      title: title.isNotEmpty ? title : 'untitled',
+    );
 
     try {
       if (!internet) {
@@ -39,23 +43,27 @@ class FirestoreService {
     return null;
   }
 
-  Future<String?> updateDocument(
-      {required String document,
-      required String searchableDocument,
-      required String title,
-      required String previousFolder,
-      required folder,
-      required String noteUid,
-      required DateTime date}) async {
+  Future<String?> updateDocument({
+    required String document,
+    required String searchableDocument,
+    required String title,
+    required String previousFolder,
+    required folder,
+    required String noteUid,
+    required DateTime date,
+  }) async {
     final internet = await Connection.checkInternet();
     final Note note = Note(
-        folder: folder,
-        searchableDocument:
-            searchableDocument.toLowerCase().replaceAll('\\n', ' '),
-        document: document,
-        date: date,
-        uid: noteUid,
-        title: title.isNotEmpty ? title : 'untitled');
+      folder: folder,
+      searchableDocument: searchableDocument.toLowerCase().replaceAll(
+        '\\n',
+        ' ',
+      ),
+      document: document,
+      date: date,
+      uid: noteUid,
+      title: title.isNotEmpty ? title : 'untitled',
+    );
 
     try {
       if (!internet) {
@@ -63,9 +71,10 @@ class FirestoreService {
       }
       await _firestore.collection(userUid).doc(noteUid).set(note.toJson());
       await firestoreFolder.updateFolder(
-          folderField: folder,
-          noteUid: noteUid,
-          previousFolder: previousFolder);
+        folderField: folder,
+        noteUid: noteUid,
+        previousFolder: previousFolder,
+      );
     } on FirebaseException catch (e) {
       return e.message!;
     }
@@ -73,12 +82,12 @@ class FirestoreService {
     return null;
   }
 
-  getNote({required String uid}) async {
+  Future<Map<String, dynamic>?> getNote({required String uid}) async {
     final snapshot = await _firestore.collection(userUid).doc(uid).get();
     return snapshot.data();
   }
 
-  clearAllNotes() async {
+  Future<String?> clearAllNotes() async {
     final folder = _firestore.collection(userUid).doc('folders');
 
     try {
@@ -94,16 +103,18 @@ class FirestoreService {
     } on FirebaseException catch (e) {
       return e.message;
     }
+    return null;
   }
 
   Future<String?> deleteDocsOfFolder(String folder) async {
-    var data =
-        _firestore.collection(userUid).where('folder', isEqualTo: folder);
+    var data = _firestore
+        .collection(userUid)
+        .where('folder', isEqualTo: folder);
     try {
       data.get().then((querySnapshot) {
-        querySnapshot.docs.forEach((element) {
+        for (var element in querySnapshot.docs) {
           element.reference.delete();
-        });
+        }
       });
     } on FirebaseException catch (e) {
       return e.message;
@@ -111,12 +122,16 @@ class FirestoreService {
     return null;
   }
 
-  Future<String?> deleteNote(
-      {required String uid, required String folder}) async {
+  Future<String?> deleteNote({
+    required String uid,
+    required String folder,
+  }) async {
     try {
       await _firestore.collection(userUid).doc(uid).delete();
       await firestoreFolder.deleteDocFromFolder(
-          folderField: folder, noteUid: uid);
+        folderField: folder,
+        noteUid: uid,
+      );
     } on FirebaseException catch (e) {
       return e.message;
     }

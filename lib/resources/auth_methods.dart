@@ -7,11 +7,15 @@ class AuthService {
 
   String get useUid => _auth.currentUser!.uid;
 
-  Future<String> createUser(
-      {required String email, required String password}) async {
+  Future<String> createUser({
+    required String email,
+    required String password,
+  }) async {
     try {
       await _auth.createUserWithEmailAndPassword(
-          email: email, password: password);
+        email: email,
+        password: password,
+      );
       await FirestoreFolderService().createMainFolder();
       return 'Account created successfully';
     } on FirebaseException catch (e) {
@@ -19,8 +23,10 @@ class AuthService {
     }
   }
 
-  Future<String?> loginUser(
-      {required String email, required String password}) async {
+  Future<String?> loginUser({
+    required String email,
+    required String password,
+  }) async {
     String? feedback;
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
@@ -71,7 +77,9 @@ class AuthService {
   Future<String?> reauthentication(String password) async {
     try {
       AuthCredential credential = EmailAuthProvider.credential(
-          email: _auth.currentUser!.email!, password: password);
+        email: _auth.currentUser!.email!,
+        password: password,
+      );
       await _auth.currentUser!.reauthenticateWithCredential(credential);
     } on FirebaseException catch (e) {
       return e.message;

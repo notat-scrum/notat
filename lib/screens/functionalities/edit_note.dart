@@ -12,7 +12,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class EditNote extends ConsumerStatefulWidget {
   final String noteUid;
-  const EditNote({Key? key, required this.noteUid}) : super(key: key);
+  const EditNote({super.key, required this.noteUid});
 
   @override
   EditNoteState createState() => EditNoteState();
@@ -42,6 +42,7 @@ class EditNoteState extends ConsumerState<EditNote> {
           error: ((error, stackTrace) => ErrorPage()),
           loading: (() => LoadingScreen()),
           data: ((data) {
+            if (data == null) return ErrorPage();
             _titleController = TextEditingController(text: data['title']);
             selected.value = data['folder'];
             final previousFolder = data['folder'];
@@ -78,7 +79,7 @@ class EditNoteState extends ConsumerState<EditNote> {
                                     if (value != null) {
                                       CustomSnackBar.show(
                                         context,
-                                        '$value',
+                                        value,
                                         Duration(seconds: 2),
                                       );
                                     }

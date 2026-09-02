@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 class CustomAppBar extends StatelessWidget {
   final VoidCallback onPressed;
 
-  const CustomAppBar({
-    required this.onPressed,
-    Key? key,
-  }) : super(key: key);
+  const CustomAppBar({required this.onPressed, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,16 +15,19 @@ class CustomAppBar extends StatelessWidget {
           width: 60,
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(15)),
           child: ElevatedButton(
-              style: ButtonStyle(
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10))),
-                  backgroundColor: MaterialStateProperty.all<Color>(
-                      const Color.fromARGB(255, 57, 56, 78))),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Icon(Icons.arrow_back_ios_new_outlined)),
+            style: ButtonStyle(
+              shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              backgroundColor: WidgetStateProperty.all<Color>(
+                const Color.fromARGB(255, 57, 56, 78),
+              ),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Icon(Icons.arrow_back_ios_new_outlined),
+          ),
         ),
         Expanded(child: SizedBox()),
         Container(
@@ -36,14 +36,17 @@ class CustomAppBar extends StatelessWidget {
           width: 70,
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(15)),
           child: ElevatedButton(
-              style: ButtonStyle(
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10))),
-                  backgroundColor: MaterialStateProperty.all<Color>(
-                      const Color.fromARGB(255, 57, 56, 78))),
-              onPressed: onPressed,
-              child: const Text('Save')),
+            style: ButtonStyle(
+              shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              backgroundColor: WidgetStateProperty.all<Color>(
+                const Color.fromARGB(255, 57, 56, 78),
+              ),
+            ),
+            onPressed: onPressed,
+            child: const Text('Save'),
+          ),
         ),
       ],
     );

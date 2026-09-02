@@ -93,7 +93,7 @@ class _HomePageState extends State<HomePage>
                           (() => showDialog(
                             context: context,
                             builder: (dialogContext) {
-                              return deleteAccountDialog();
+                              return DeleteAccountDialog();
                             },
                           )),
                         );
@@ -112,7 +112,7 @@ class _HomePageState extends State<HomePage>
                     padding: const EdgeInsets.only(right: 15, left: 5),
                     child: Icon(
                       Icons.more_horiz_outlined,
-                      color: Theme.of(context).hintColor.withOpacity(0.5),
+                      color: Theme.of(context).hintColor.withValues(alpha: 0.5),
                       size: 30,
                     ),
                   ),

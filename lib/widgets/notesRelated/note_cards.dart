@@ -19,7 +19,7 @@ import 'package:jiffy/jiffy.dart';
 
 class NoteCards extends StatefulWidget {
   final AsyncValue<QuerySnapshot<Map<String, dynamic>>> snapshot;
-  NoteCards(this.snapshot);
+  const NoteCards(this.snapshot, {super.key});
 
   @override
   State<NoteCards> createState() => _NoteCardsState();
@@ -30,7 +30,7 @@ class _NoteCardsState extends State<NoteCards> {
   Widget build(BuildContext context) {
     return widget.snapshot.when(
       data: ((snapshot) {
-        if (snapshot.docs.length == 0) {
+        if (snapshot.docs.isEmpty) {
           return EmptyResult();
         }
         return MasonryGridView.builder(

@@ -22,39 +22,43 @@ class LoginScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).cardColor,
       body: SizedBox(
-          child: SingleChildScrollView(
-              //physics: const NeverScrollableScrollPhysics(),
-              child: Stack(
-        children: [
-          Positioned(
-            child: Opacity(
-              opacity: 0.8,
-              child: Image.asset(
-                'assets/pexels-irina-iriser-1381679.jpg',
-                fit: BoxFit.contain,
+        child: SingleChildScrollView(
+          //physics: const NeverScrollableScrollPhysics(),
+          child: Stack(
+            children: [
+              Positioned(
+                child: Opacity(
+                  opacity: 0.8,
+                  child: Image.asset(
+                    'assets/pexels-irina-iriser-1381679.jpg',
+                    fit: BoxFit.contain,
+                  ),
+                ),
               ),
-            ),
+              Positioned(
+                top: height * 0.13,
+                left: width * 0.35,
+                child: Text(
+                  "Notat",
+                  style: GoogleFonts.philosopher(fontSize: 55),
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.only(top: height * 0.3),
+                height: height * 0.75,
+                width: width,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(100),
+                  ),
+                ),
+                child: const LoginDetails(),
+              ),
+            ],
           ),
-          Positioned(
-            top: height * 0.13,
-            left: width * 0.35,
-            child: Text(
-              "Notat",
-              style: GoogleFonts.philosopher(fontSize: 55),
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.only(top: height * 0.3),
-            height: height * 0.75,
-            width: width,
-            decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius:
-                    const BorderRadius.only(topLeft: Radius.circular(100))),
-            child: const LoginDetails(),
-          )
-        ],
-      ))),
+        ),
+      ),
     );
   }
 }
@@ -71,12 +75,14 @@ class _LoginDetailsState extends State<LoginDetails> {
   bool isWaiting = false;
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-//------------------------------------------------------------------------
-  loginProcess() async {
+  //------------------------------------------------------------------------
+  Future<void> loginProcess() async {
     if (_key.currentState!.validate() == true) {
       changeIsWaiting();
       final String? auth = await AuthService().loginUser(
-          email: emailController.text, password: passwordController.text);
+        email: emailController.text,
+        password: passwordController.text,
+      );
 
       if (auth == null) {
         //check if login is successful
@@ -86,7 +92,7 @@ class _LoginDetailsState extends State<LoginDetails> {
           Navigator.of(context)
               .pushReplacement(FadeTrans(translateTo: const HomePage()));
         } else {
-          CustomBottomSheet(context);
+          customBottomSheet(context);
         }
       } else {
         changeIsWaiting();
@@ -95,7 +101,7 @@ class _LoginDetailsState extends State<LoginDetails> {
     }
   }
 
-//----------------------------------------------------------------
+  //----------------------------------------------------------------
   void changeIsWaiting() {
     setState(() {
       isWaiting = !isWaiting;
@@ -110,128 +116,137 @@ class _LoginDetailsState extends State<LoginDetails> {
     super.dispose();
   }
 
-//-------------------------
+  //-------------------------
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return ListView(
       physics: NeverScrollableScrollPhysics(),
       children: [
-        SizedBox(
-          height: size.width * 0.1,
+        SizedBox(height: size.width * 0.1),
+        Text(
+          "Welcome back",
+          textAlign: TextAlign.center,
+          style: GoogleFonts.roboto(
+            fontSize: 35,
+            color: const Color.fromARGB(255, 187, 187, 242),
+          ),
         ),
-        Text("Welcome back",
-            textAlign: TextAlign.center,
-            style: GoogleFonts.roboto(
-                fontSize: 35, color: const Color.fromARGB(255, 187, 187, 242))),
-        const SizedBox(
-          height: 5,
-        ),
+        const SizedBox(height: 5),
         Text(
           'Login to your account',
           textAlign: TextAlign.center,
           style: GoogleFonts.roboto(fontSize: 13, color: Colors.white54),
         ),
         Form(
-            key: _key,
-            child: Column(
-              children: [
-                Container(
-                  margin: const EdgeInsets.only(top: 60, right: 45, left: 45),
-                  child: InputTextField(
-                    controller: emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    hintText: 'Email',
-                    isPassword: false,
-                    toNextField: true,
-                    validator: (text) {
-                      if (emailRegExp.hasMatch(text!)) {
-                        return null;
-                      }
-                      return 'Invalid Email';
-                    },
-                  ),
+          key: _key,
+          child: Column(
+            children: [
+              Container(
+                margin: const EdgeInsets.only(top: 60, right: 45, left: 45),
+                child: InputTextField(
+                  controller: emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  hintText: 'Email',
+                  isPassword: false,
+                  toNextField: true,
+                  validator: (text) {
+                    if (emailRegExp.hasMatch(text!)) {
+                      return null;
+                    }
+                    return 'Invalid Email';
+                  },
                 ),
-                Container(
-                  margin: const EdgeInsets.only(top: 20, right: 45, left: 45),
-                  child: InputTextField(
-                    controller: passwordController,
-                    toNextField: false,
-                    keyboardType: TextInputType.text,
-                    hintText: 'Password',
-                    isPassword: true,
-                    validator: (text) {
-                      if (passwordRegExp.hasMatch(text!)) {
-                        return null;
-                      }
+              ),
+              Container(
+                margin: const EdgeInsets.only(top: 20, right: 45, left: 45),
+                child: InputTextField(
+                  controller: passwordController,
+                  toNextField: false,
+                  keyboardType: TextInputType.text,
+                  hintText: 'Password',
+                  isPassword: true,
+                  validator: (text) {
+                    if (passwordRegExp.hasMatch(text!)) {
+                      return null;
+                    }
 
-                      return 'Weak password, try adding a number, a letter or a special character';
-                    },
+                    return 'Weak password, try adding a number, a letter or a special character';
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 170),
+                child: TextButton(
+                  onPressed: () async {
+                    final internet = await Connection.checkInternet();
+                    if (internet) {
+                      forgotPassBottomSheet(context);
+                    } else {
+                      CustomSnackBar.show(
+                        context,
+                        'No internet connection',
+                        Duration(seconds: 3),
+                      );
+                    }
+                  },
+                  child: Text(
+                    "Forgot password?",
+                    style: GoogleFonts.roboto(
+                      color: const Color.fromARGB(255, 187, 187, 242),
+                    ),
                   ),
                 ),
-                Padding(
-                    padding: const EdgeInsets.only(left: 170),
-                    child: TextButton(
-                        onPressed: () async {
-                          final internet = await Connection.checkInternet();
-                          if (internet) {
-                            forgotPassBottomSheet(context);
-                          } else {
-                            CustomSnackBar.show(context,
-                                'No internet connection', Duration(seconds: 3));
-                          }
-                        },
-                        child: Text(
-                          "Forgot password?",
-                          style: GoogleFonts.roboto(
-                              color: const Color.fromARGB(255, 187, 187, 242)),
-                        ))),
-                SizedBox(
-                  height: size.height * 0.1,
+              ),
+              SizedBox(height: size.height * 0.1),
+              SizedBox(
+                //margin: const EdgeInsets.only(top: 90),
+                height: 38,
+                width: 320,
+                child: CustomButton(
+                  backgroundColor: Theme.of(context).primaryColor,
+                  labelColor: Colors.white,
+                  onTap: () async {
+                    loginProcess();
+                  },
+                  isDisabled: isWaiting,
+                  isRounded: true,
+                  child: isWaiting
+                      ? LoadingAnimationWidget.staggeredDotsWave(
+                          size: 20,
+                          color: Colors.white,
+                        )
+                      : const Text("Login"),
                 ),
-                Container(
-                  //margin: const EdgeInsets.only(top: 90),
-                  height: 38,
-                  width: 320,
-                  child: CustomButton(
-                    backgroundColor: Theme.of(context).primaryColor,
-                    labelColor: Colors.white,
-                    onTap: () async {
-                      loginProcess();
-                    },
-                    isDisabled: isWaiting,
-                    isRounded: true,
-                    child: isWaiting
-                        ? LoadingAnimationWidget.staggeredDotsWave(
-                            size: 20, color: Colors.white)
-                        : const Text("Login"),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 100),
-                  child: Row(
-                    children: [
-                      Text(
-                        "Don't have an account?",
-                        style: GoogleFonts.roboto(
-                            color: const Color.fromARGB(255, 187, 187, 242)),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 100),
+                child: Row(
+                  children: [
+                    Text(
+                      "Don't have an account?",
+                      style: GoogleFonts.roboto(
+                        color: const Color.fromARGB(255, 187, 187, 242),
                       ),
-                      TextButton(
-                          onPressed: () {
-                            Navigator.of(context)
-                                .pushReplacementNamed('Sign up');
-                          },
-                          child: Text(
-                            "Sign up",
-                            style: GoogleFonts.roboto(
-                                fontWeight: FontWeight.w500,
-                                color: const Color.fromARGB(178, 124, 77, 255)),
-                          )),
-                    ],
-                  ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pushReplacementNamed('Sign up');
+                      },
+                      child: Text(
+                        "Sign up",
+                        style: GoogleFonts.roboto(
+                          fontWeight: FontWeight.w500,
+                          color: const Color.fromARGB(178, 124, 77, 255),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            )),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }

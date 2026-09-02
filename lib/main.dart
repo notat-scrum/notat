@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -27,12 +28,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: CustomTheme.DarkTheme,
+      theme: CustomTheme.darkTheme,
       home: const Wrapper(),
       routes: {
         'Login': (context) => const LoginScreen(),
         'Sign up': (context) => const SignUpScreen(),
-        'Home page': (context) => const HomePage()
+        'Home page': (context) => const HomePage(),
       },
     );
   }

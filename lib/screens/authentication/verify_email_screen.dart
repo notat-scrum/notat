@@ -9,7 +9,7 @@ import 'package:flutter_application_again/widgets/reusedComponents/sign_button.d
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 
-Future<dynamic> CustomBottomSheet(BuildContext context) {
+Future<dynamic> customBottomSheet(BuildContext context) {
   return showModalBottomSheet<dynamic>(
     isScrollControlled: true,
     enableDrag: false,
@@ -43,34 +43,23 @@ class _VerifyEmailState extends State<VerifyEmail> {
     });
   }
 
-  checkVerification() async {
+  Future<void> checkVerification() async {
     await FirebaseAuth.instance.currentUser?.reload();
     final user = FirebaseAuth.instance.currentUser;
     if (user?.emailVerified ?? false) {
       Navigator.of(
         context,
         rootNavigator: true,
-      ).pushReplacementNamed('Home page').then((value) {
-        disposeScreen();
-      });
+      ).pushReplacementNamed('Home page');
     }
   }
 
-  sendEmailVerification() async {
+  Future<void> sendEmailVerification() async {
     if (AuthService().isVerified) {
       Navigator.of(context)
-          .pushReplacement(FadeTrans(translateTo: const HomePage()))
-          .then((value) {
-            disposeScreen();
-          });
+          .pushReplacement(FadeTrans(translateTo: const HomePage()));
     } else {
       FirebaseAuth.instance.currentUser!.sendEmailVerification();
-    }
-  }
-
-  void disposeScreen() {
-    if (!mounted) {
-      print('disposed ---------');
     }
   }
 

@@ -6,11 +6,11 @@ import 'package:google_fonts/google_fonts.dart';
 
 class FolderDialog extends StatelessWidget {
   const FolderDialog({
-    Key? key,
+    super.key,
     required this.formKey,
     required this.folderController,
     required this.keys,
-  }) : super(key: key);
+  });
 
   final GlobalKey<FormState> formKey;
   final TextEditingController folderController;
@@ -21,33 +21,31 @@ class FolderDialog extends StatelessWidget {
     return AlertDialog(
       actions: [
         TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              folderController.clear();
-            },
-            child: Text(
-              'Cancel',
-              style: GoogleFonts.ubuntu(color: Colors.red),
-            )),
+          onPressed: () {
+            Navigator.of(context).pop();
+            folderController.clear();
+          },
+          child: Text('Cancel', style: GoogleFonts.ubuntu(color: Colors.red)),
+        ),
         TextButton(
-            onPressed: () async {
-              if (formKey.currentState!.validate() == true) {
-                await FirestoreFolderService()
-                    .createFolder(folderController.text)
-                    .then((value) {
-                  if (value != null) {
-                    CustomSnackBar.show(
-                        context, '$value', Duration(seconds: 2));
-                  }
-                });
-              }
-              Navigator.of(context).pop();
-              folderController.clear();
-            },
-            child: Text(
-              'Add',
-              style: GoogleFonts.ubuntu(color: Theme.of(context).primaryColor),
-            ))
+          onPressed: () async {
+            if (formKey.currentState!.validate() == true) {
+              await FirestoreFolderService()
+                  .createFolder(folderController.text)
+                  .then((value) {
+                    if (value != null) {
+                      CustomSnackBar.show(context, value, Duration(seconds: 2));
+                    }
+                  });
+            }
+            Navigator.of(context).pop();
+            folderController.clear();
+          },
+          child: Text(
+            'Add',
+            style: GoogleFonts.ubuntu(color: Theme.of(context).primaryColor),
+          ),
+        ),
       ],
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       title: Text(
@@ -58,19 +56,20 @@ class FolderDialog extends StatelessWidget {
         key: formKey,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         child: InputTextField(
-            autofocus: true,
-            hintText: 'Folder Name',
-            isPassword: false,
-            validator: (val) {
-              if (!(keys.contains(val)) && (val != null && val.isNotEmpty)) {
-                return null;
-              }
-              return 'Find another name';
-            },
-            keyboardType: TextInputType.text,
-            toNextField: false,
-            maxLength: 25,
-            controller: folderController),
+          autofocus: true,
+          hintText: 'Folder Name',
+          isPassword: false,
+          validator: (val) {
+            if (!(keys.contains(val)) && (val != null && val.isNotEmpty)) {
+              return null;
+            }
+            return 'Find another name';
+          },
+          keyboardType: TextInputType.text,
+          toNextField: false,
+          maxLength: 25,
+          controller: folderController,
+        ),
       ),
     );
   }
