@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:notat/resources/auth_methods.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:notat/providers/auth_provider.dart';
 import 'package:notat/utils/regex.dart';
 import 'package:notat/widgets/reusedComponents/input_text_field.dart';
 import 'package:notat/widgets/reusedComponents/sign_button.dart';
@@ -20,14 +21,14 @@ Future<dynamic> forgotPassBottomSheet(BuildContext context) {
   );
 }
 
-class ForgotPassword extends StatefulWidget {
+class ForgotPassword extends ConsumerStatefulWidget {
   const ForgotPassword({super.key});
 
   @override
-  State<ForgotPassword> createState() => _ForgotPasswordState();
+  ConsumerState<ForgotPassword> createState() => _ForgotPasswordState();
 }
 
-class _ForgotPasswordState extends State<ForgotPassword> {
+class _ForgotPasswordState extends ConsumerState<ForgotPassword> {
   final _key = GlobalKey<FormState>();
   final TextEditingController _controller = TextEditingController();
   @override
@@ -94,9 +95,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 isRounded: true,
                 onTap: () async {
                   if (_key.currentState!.validate() == true) {
-                    final erro = await AuthService().restPassword(
-                      _controller.text,
-                    );
+                    final erro = await ref
+                        .read(authServiceProvider)
+                        .restPassword(_controller.text);
                     if (!context.mounted) return;
                     Navigator.of(context).pop();
                     CustomSnackBar.show(

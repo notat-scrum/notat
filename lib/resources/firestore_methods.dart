@@ -1,14 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:notat/models/note.dart';
-import 'package:notat/resources/auth_methods.dart';
 import 'package:notat/resources/firstore_folder_methods.dart';
 import 'package:notat/resources/internet_connection.dart';
 import 'package:uuid/uuid.dart';
 
 class FirestoreService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final firestoreFolder = FirestoreFolderService();
-  final userUid = AuthService().useUid;
+  FirestoreService(this._firestore, this.userUid)
+    : firestoreFolder = FirestoreFolderService(_firestore, userUid);
+
+  final FirebaseFirestore _firestore;
+  final FirestoreFolderService firestoreFolder;
+  final String userUid;
 
   Future<String?> addDocument({
     required String document,
@@ -138,7 +140,7 @@ class FirestoreService {
     return null;
   }
 
-  Future<String?> deleteAllDocs(String uid) async {
+  Future<String?> deleteAllDocs() async {
     try {
       await _firestore.collection(userUid).get().then((value) {
         for (DocumentSnapshot ds in value.docs) {

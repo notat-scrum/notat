@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:notat/resources/firstore_folder_methods.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:notat/providers/auth_provider.dart';
 import 'package:notat/widgets/reusedComponents/input_text_field.dart';
 import 'package:notat/widgets/reusedComponents/snackbar.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class FolderDialog extends StatelessWidget {
+class FolderDialog extends ConsumerWidget {
   const FolderDialog({
     super.key,
     required this.formKey,
@@ -17,7 +18,7 @@ class FolderDialog extends StatelessWidget {
   final List<String> keys;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return AlertDialog(
       actions: [
         TextButton(
@@ -30,9 +31,9 @@ class FolderDialog extends StatelessWidget {
         TextButton(
           onPressed: () async {
             if (formKey.currentState!.validate() == true) {
-              final erro = await FirestoreFolderService().createFolder(
-                folderController.text,
-              );
+              final erro = await ref
+                  .read(firestoreFolderServiceProvider)
+                  .createFolder(folderController.text);
               if (!context.mounted) return;
               if (erro != null) {
                 CustomSnackBar.show(context, erro, Duration(seconds: 2));

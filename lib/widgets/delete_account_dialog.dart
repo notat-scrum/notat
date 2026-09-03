@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:notat/resources/auth_methods.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:notat/providers/auth_provider.dart';
 import 'package:notat/screens/authentication/introduction_screen.dart';
 import 'package:notat/utils/regex.dart';
 import 'package:notat/widgets/reusedComponents/animation_transition.dart';
 import 'package:notat/widgets/reusedComponents/input_text_field.dart';
 import 'package:notat/widgets/reusedComponents/snackbar.dart';
 
-class DeleteAccountDialog extends StatelessWidget {
+class DeleteAccountDialog extends ConsumerWidget {
   final TextEditingController _controller = TextEditingController();
   final _key = GlobalKey<FormState>();
-  final auth = AuthService();
   DeleteAccountDialog({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final auth = ref.read(authServiceProvider);
     return AlertDialog(
       title: Text('Delete Account'),
       content: SizedBox(

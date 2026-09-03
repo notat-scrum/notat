@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:notat/providers/auth_provider.dart';
 import 'package:notat/providers/note_provider.dart';
-import 'package:notat/resources/firestore_methods.dart';
 import 'package:notat/screens/errorAndLoading/error_screen.dart';
 import 'package:notat/screens/errorAndLoading/loading_screen.dart';
 import 'package:notat/widgets/notesRelated/custom_app_bar.dart';
@@ -63,7 +63,8 @@ class EditNoteState extends ConsumerState<EditNote> {
                               String plainText = jsonEncode(
                                 _controller.document.toPlainText(),
                               );
-                              final erro = await FirestoreService()
+                              final erro = await ref
+                                  .read(firestoreServiceProvider)
                                   .updateDocument(
                                     previousFolder: previousFolder,
                                     folder: selected.value,

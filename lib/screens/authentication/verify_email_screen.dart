@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:notat/resources/auth_methods.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:notat/providers/auth_provider.dart';
 import 'package:notat/screens/functionalities/home_page.dart';
 import 'package:notat/widgets/reusedComponents/animation_transition.dart';
 import 'package:notat/widgets/reusedComponents/sign_button.dart';
@@ -22,14 +22,14 @@ Future<dynamic> customBottomSheet(BuildContext context) {
   );
 }
 
-class VerifyEmail extends StatefulWidget {
+class VerifyEmail extends ConsumerStatefulWidget {
   const VerifyEmail({super.key});
 
   @override
-  State<VerifyEmail> createState() => _VerifyEmailState();
+  ConsumerState<VerifyEmail> createState() => _VerifyEmailState();
 }
 
-class _VerifyEmailState extends State<VerifyEmail> {
+class _VerifyEmailState extends ConsumerState<VerifyEmail> {
   static const _duracaoInicial = Duration(minutes: 2);
 
   Duration _restante = _duracaoInicial;
@@ -44,10 +44,10 @@ class _VerifyEmailState extends State<VerifyEmail> {
   }
 
   Future<void> checkVerification() async {
-    await FirebaseAuth.instance.currentUser?.reload();
+    final servico = ref.read(authServiceProvider);
+    await servico.reloadUser();
     if (!mounted) return;
-    final user = FirebaseAuth.instance.currentUser;
-    if (user?.emailVerified ?? false) {
+    if (servico.isVerified) {
       Navigator.of(
         context,
         rootNavigator: true,
@@ -56,11 +56,12 @@ class _VerifyEmailState extends State<VerifyEmail> {
   }
 
   Future<void> sendEmailVerification() async {
-    if (AuthService().isVerified) {
+    final servico = ref.read(authServiceProvider);
+    if (servico.isVerified) {
       Navigator.of(context)
           .pushReplacement(FadeTrans(translateTo: const HomePage()));
     } else {
-      FirebaseAuth.instance.currentUser!.sendEmailVerification();
+      await servico.sendEmailVerification();
     }
   }
 

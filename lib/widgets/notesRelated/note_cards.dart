@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:notat/resources/firestore_methods.dart';
+import 'package:notat/providers/auth_provider.dart';
 import 'package:notat/screens/errorAndLoading/error_screen.dart';
 import 'package:notat/screens/functionalities/edit_note.dart';
 import 'package:notat/screens/errorAndLoading/empty_result.dart';
@@ -17,15 +17,15 @@ import 'package:focused_menu/modals.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jiffy/jiffy.dart';
 
-class NoteCards extends StatefulWidget {
+class NoteCards extends ConsumerStatefulWidget {
   final AsyncValue<QuerySnapshot<Map<String, dynamic>>> snapshot;
   const NoteCards(this.snapshot, {super.key});
 
   @override
-  State<NoteCards> createState() => _NoteCardsState();
+  ConsumerState<NoteCards> createState() => _NoteCardsState();
 }
 
-class _NoteCardsState extends State<NoteCards> {
+class _NoteCardsState extends ConsumerState<NoteCards> {
   @override
   Widget build(BuildContext context) {
     return widget.snapshot.when(
@@ -84,10 +84,12 @@ class _NoteCardsState extends State<NoteCards> {
                   ),
                   title: const Text('Delete'),
                   onPressed: () async {
-                    await FirestoreService().deleteNote(
-                      uid: myData['uid'],
-                      folder: myData['folder'],
-                    );
+                    await ref
+                        .read(firestoreServiceProvider)
+                        .deleteNote(
+                          uid: myData['uid'],
+                          folder: myData['folder'],
+                        );
                   },
                   backgroundColor: Colors.redAccent,
                 ),

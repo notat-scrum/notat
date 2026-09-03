@@ -1,22 +1,31 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:notat/resources/firestore_methods.dart';
 import 'package:notat/resources/firstore_folder_methods.dart';
 
 class AuthService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  AuthService(this._auth, this._firestore);
 
-  String get useUid => _auth.currentUser!.uid;
+  final FirebaseAuth _auth;
+  final FirebaseFirestore _firestore;
+
+  String? get currentUid => _auth.currentUser?.uid;
 
   Future<String> createUser({
     required String email,
     required String password,
   }) async {
     try {
-      await _auth.createUserWithEmailAndPassword(
+      final credencial = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-      await FirestoreFolderService().createMainFolder();
+      // o uid vem da credencial recem-criada, nao de currentUser, que ainda
+      // pode nao ter propagado
+      await FirestoreFolderService(
+        _firestore,
+        credencial.user!.uid,
+      ).createMainFolder();
       return 'Account created successfully';
     } on FirebaseException catch (e) {
       return e.message!;
@@ -55,13 +64,16 @@ class AuthService {
   }
 
   Future<String?> deleteAccount() async {
+    final usuario = _auth.currentUser;
+    if (usuario == null) {
+      return 'No signed in user';
+    }
     try {
-      await FirestoreService().deleteAllDocs(useUid);
-      await _auth.currentUser!.delete();
+      await FirestoreService(_firestore, usuario.uid).deleteAllDocs();
+      await usuario.delete();
     } on FirebaseException catch (e) {
       return e.message;
     }
-
     return null;
   }
 
@@ -75,17 +87,24 @@ class AuthService {
   }
 
   Future<String?> reauthentication(String password) async {
+    final usuario = _auth.currentUser;
+    if (usuario?.email == null) {
+      return 'No signed in user';
+    }
     try {
-      AuthCredential credential = EmailAuthProvider.credential(
-        email: _auth.currentUser!.email!,
+      final credencial = EmailAuthProvider.credential(
+        email: usuario!.email!,
         password: password,
       );
-      await _auth.currentUser!.reauthenticateWithCredential(credential);
+      await usuario.reauthenticateWithCredential(credencial);
     } on FirebaseException catch (e) {
       return e.message;
     }
     return null;
   }
 
-  bool get isVerified => _auth.currentUser!.emailVerified;
+  Future<void> sendEmailVerification() =>
+      _auth.currentUser?.sendEmailVerification() ?? Future.value();
+
+  bool get isVerified => _auth.currentUser?.emailVerified ?? false;
 }
