@@ -1,7 +1,8 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:notat/models/note.dart';
 import 'package:notat/resources/firstore_folder_methods.dart';
-import 'package:notat/resources/internet_connection.dart';
 import 'package:uuid/uuid.dart';
 
 class FirestoreService {
@@ -20,7 +21,6 @@ class FirestoreService {
     required DateTime date,
   }) async {
     final String uid = const Uuid().v4();
-    final internet = await Connection.checkInternet();
     final Note note = Note(
       folderId: folder,
       document: document,
@@ -34,10 +34,12 @@ class FirestoreService {
     );
 
     try {
-      if (!internet) {
-        return 'No internet connection';
-      }
-      await _firestore.collection(userUid).doc(uid).set(note.toFirestore());
+      // o set() so completa quando o servidor confirma; sem internet ele fica
+      // pendente para sempre e a tela travaria. O SDK ja guarda a escrita
+      // localmente e sincroniza sozinho quando a conexao volta.
+      unawaited(
+        _firestore.collection(userUid).doc(uid).set(note.toFirestore()),
+      );
       await firestoreFolder.addDocToFolder(folderField: folder, noteUid: uid);
     } on FirebaseException catch (e) {
       return e.message!;
@@ -54,7 +56,6 @@ class FirestoreService {
     required String noteUid,
     required DateTime date,
   }) async {
-    final internet = await Connection.checkInternet();
     final Note note = Note(
       folderId: folder,
       searchableDocument: searchableDocument.toLowerCase().replaceAll(
@@ -68,10 +69,9 @@ class FirestoreService {
     );
 
     try {
-      if (!internet) {
-        return 'No internet connection';
-      }
-      await _firestore.collection(userUid).doc(noteUid).set(note.toFirestore());
+      unawaited(
+        _firestore.collection(userUid).doc(noteUid).set(note.toFirestore()),
+      );
       await firestoreFolder.updateFolder(
         folderField: folder,
         noteUid: noteUid,

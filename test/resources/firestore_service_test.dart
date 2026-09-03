@@ -57,31 +57,34 @@ void main() {
       expect(salva.containsKey('folder'), isFalse);
     });
 
-    test('editar a nota troca o folderId sem escrever em dois lugares', () async {
-      await servico.addDocument(
-        document: '[{"insert":"conteudo\\n"}]',
-        title: 'Primeira',
-        searchableDocument: 'conteudo',
-        folder: 'All',
-        date: DateTime(2026, 9, 3),
-      );
-      final noteUid = (await notas(db).get()).docs.single.id;
+    test(
+      'editar a nota troca o folderId sem escrever em dois lugares',
+      () async {
+        await servico.addDocument(
+          document: '[{"insert":"conteudo\\n"}]',
+          title: 'Primeira',
+          searchableDocument: 'conteudo',
+          folder: 'All',
+          date: DateTime(2026, 9, 3),
+        );
+        final noteUid = (await notas(db).get()).docs.single.id;
 
-      final erro = await servico.updateDocument(
-        document: '[{"insert":"novo\\n"}]',
-        searchableDocument: 'novo',
-        title: 'Editada',
-        previousFolder: 'All',
-        folder: 'Trabalho',
-        noteUid: noteUid,
-        date: DateTime(2026, 9, 4),
-      );
+        final erro = await servico.updateDocument(
+          document: '[{"insert":"novo\\n"}]',
+          searchableDocument: 'novo',
+          title: 'Editada',
+          previousFolder: 'All',
+          folder: 'Trabalho',
+          noteUid: noteUid,
+          date: DateTime(2026, 9, 4),
+        );
 
-      expect(erro, isNull);
-      final salva = (await notas(db).doc(noteUid).get()).data()!;
-      expect(salva['title'], 'Editada');
-      expect(salva['folderId'], 'Trabalho');
-    });
+        expect(erro, isNull);
+        final salva = (await notas(db).doc(noteUid).get()).data()!;
+        expect(salva['title'], 'Editada');
+        expect(salva['folderId'], 'Trabalho');
+      },
+    );
 
     test('excluir a nota tira o documento da colecao', () async {
       await servico.addDocument(

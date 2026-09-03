@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:notat/resources/firestore_methods.dart';
-import 'package:notat/resources/internet_connection.dart';
 
 class FirestoreFolderService {
   FirestoreFolderService(this._firestore, this.userUid);
@@ -21,12 +20,8 @@ class FirestoreFolderService {
   }
 
   Future<String?> createFolder(String name) async {
-    final internet = await Connection.checkInternet();
     List<String> notes = [];
     try {
-      if (!internet) {
-        return 'No internet connection';
-      }
       await _firestore.collection(userUid).doc('folders').update({name: notes});
     } on FirebaseException catch (e) {
       return e.message;
