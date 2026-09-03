@@ -107,7 +107,9 @@ na frente do comando em vez de trocar o padrao da maquina.
 O painel dos emuladores fica em `http://localhost:4000`. O Auth emulado nao envia e-mail de
 verdade: o link de verificacao aparece no log do `firebase emulators:start`.
 
-Em aparelho fisico, `10.0.2.2` nao resolve. Passe o IP da maquina na rede local:
+Em aparelho fisico, `10.0.2.2` nao resolve. Passe o IP da maquina na rede local e acrescente
+esse mesmo IP em `android/app/src/debug/res/xml/network_security_config.xml`, senao o Android
+bloqueia a conexao por ser texto claro:
 
 ```
 fvm flutter run --dart-define=USE_FIREBASE_EMULATOR=true --dart-define=FIREBASE_EMULATOR_HOST=192.168.0.10
