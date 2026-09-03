@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:notat/providers/note_provider.dart';
 import 'package:notat/resources/firestore_methods.dart';
 import 'package:notat/screens/errorAndLoading/error_screen.dart';
 import 'package:notat/screens/errorAndLoading/loading_screen.dart';
@@ -19,9 +20,6 @@ class EditNote extends ConsumerStatefulWidget {
 }
 
 class EditNoteState extends ConsumerState<EditNote> {
-  late final futureNote = FutureProvider(
-    ((ref) => FirestoreService().getNote(uid: widget.noteUid)),
-  );
   ValueNotifier<String?> selected = ValueNotifier(null);
   late TextEditingController _titleController;
   late editor.QuillController _controller;
@@ -37,7 +35,7 @@ class EditNoteState extends ConsumerState<EditNote> {
   @override
   Widget build(BuildContext context) {
     return ref
-        .watch(futureNote)
+        .watch(noteProvider(widget.noteUid))
         .when(
           error: ((error, stackTrace) => ErrorPage()),
           loading: (() => LoadingScreen()),

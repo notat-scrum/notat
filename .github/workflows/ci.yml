@@ -38,5 +38,10 @@ jobs:
       - name: Análise estática
         run: flutter analyze --fatal-infos
 
+      # o flutter analyze não carrega plugins do analysis_server_plugin, então o
+      # riverpod_lint só aparece pelo dart analyze
+      - name: Regras do Riverpod
+        run: dart analyze --fatal-infos
+
       - name: Testes
         run: flutter test
