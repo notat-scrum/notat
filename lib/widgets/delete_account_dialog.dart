@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:notat/providers/auth_provider.dart';
 import 'package:notat/screens/authentication/introduction_screen.dart';
-import 'package:notat/utils/regex.dart';
 import 'package:notat/widgets/reusedComponents/animation_transition.dart';
 import 'package:notat/widgets/reusedComponents/input_text_field.dart';
 import 'package:notat/widgets/reusedComponents/snackbar.dart';
@@ -43,13 +42,10 @@ class _DeleteAccountDialogState extends ConsumerState<DeleteAccountDialog> {
                 hintText: 'Confirm Password',
                 isPassword: true,
                 validator: (val) {
-                  if (val != null &&
-                      val.isNotEmpty &&
-                      passwordRegExp.hasMatch(val)) {
+                  if (val != null && val.isNotEmpty) {
                     return null;
-                  } else {
-                    return 'Invalid password';
                   }
+                  return 'Enter your password';
                 },
                 keyboardType: TextInputType.text,
                 toNextField: false,

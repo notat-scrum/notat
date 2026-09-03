@@ -169,12 +169,13 @@ class _LoginDetailsState extends ConsumerState<LoginDetails> {
                   keyboardType: TextInputType.text,
                   hintText: 'Password',
                   isPassword: true,
+                  // a regra de forca vale so no cadastro: aplicada aqui, ela
+                  // tranca fora quem criou a conta antes da regra existir
                   validator: (text) {
-                    if (passwordRegExp.hasMatch(text!)) {
+                    if (text != null && text.isNotEmpty) {
                       return null;
                     }
-
-                    return 'Weak password, try adding a number, a letter or a special character';
+                    return 'Enter your password';
                   },
                 ),
               ),
