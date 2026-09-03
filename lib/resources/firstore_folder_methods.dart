@@ -9,7 +9,6 @@ class FirestoreFolderService {
 
   Future<String?> createMainFolder() async {
     //create the folder 'All' so you have a document to start with
-    _firestore.settings.copyWith(persistenceEnabled: true);
     List<String> notes = [];
     try {
       await _firestore.collection(userUid).doc('folders').set({'All': notes});
@@ -97,15 +96,17 @@ class FirestoreFolderService {
   Future<String?> clearFolders() async {
     //Go inside the 'folder' doc, and set all folders to []
     try {
-      await _firestore
+      final documento = await _firestore
           .collection(userUid)
           .doc('folders')
-          .get()
-          .then(
-            (value) => value.data()?.forEach((key, value) {
-              _firestore.collection(userUid).doc('folders').update({key: []});
-            }),
-          );
+          .get();
+      final vazias = <String, dynamic>{
+        for (final chave in documento.data()?.keys ?? const <String>[])
+          chave: <String>[],
+      };
+      if (vazias.isNotEmpty) {
+        await _firestore.collection(userUid).doc('folders').update(vazias);
+      }
     } on FirebaseException catch (e) {
       return e.message;
     }

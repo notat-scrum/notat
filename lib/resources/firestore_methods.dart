@@ -96,14 +96,14 @@ class FirestoreService {
     final folder = _firestore.collection(userUid).doc('folders');
 
     try {
-      await _firestore.collection(userUid).get().then((value) {
-        //Delete all docs except the folder doc
-        for (DocumentSnapshot ds in value.docs) {
-          if (ds.reference != folder) {
-            ds.reference.delete();
-          }
+      final documentos = await _firestore.collection(userUid).get();
+      final lote = _firestore.batch();
+      for (final ds in documentos.docs) {
+        if (ds.reference != folder) {
+          lote.delete(ds.reference);
         }
-      });
+      }
+      await lote.commit();
       await firestoreFolder.clearFolders();
     } on FirebaseException catch (e) {
       return e.message;
@@ -112,15 +112,16 @@ class FirestoreService {
   }
 
   Future<String?> deleteDocsOfFolder(String folder) async {
-    var data = _firestore
-        .collection(userUid)
-        .where('folder', isEqualTo: folder);
     try {
-      data.get().then((querySnapshot) {
-        for (var element in querySnapshot.docs) {
-          element.reference.delete();
-        }
-      });
+      final documentos = await _firestore
+          .collection(userUid)
+          .where('folder', isEqualTo: folder)
+          .get();
+      final lote = _firestore.batch();
+      for (final ds in documentos.docs) {
+        lote.delete(ds.reference);
+      }
+      await lote.commit();
     } on FirebaseException catch (e) {
       return e.message;
     }
@@ -145,11 +146,12 @@ class FirestoreService {
 
   Future<String?> deleteAllDocs() async {
     try {
-      await _firestore.collection(userUid).get().then((value) {
-        for (DocumentSnapshot ds in value.docs) {
-          ds.reference.delete();
-        }
-      });
+      final documentos = await _firestore.collection(userUid).get();
+      final lote = _firestore.batch();
+      for (final ds in documentos.docs) {
+        lote.delete(ds.reference);
+      }
+      await lote.commit();
     } on FirebaseException catch (e) {
       return e.message;
     }
