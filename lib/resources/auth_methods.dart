@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:notat/resources/firestore_methods.dart';
+import 'package:notat/utils/auth_errors.dart';
 import 'package:notat/resources/firstore_folder_methods.dart';
 
 class AuthService {
@@ -11,7 +12,8 @@ class AuthService {
 
   String? get currentUid => _auth.currentUser?.uid;
 
-  Future<String> createUser({
+  /// Devolve null quando a conta e criada. Qualquer string e mensagem de erro.
+  Future<String?> createUser({
     required String email,
     required String password,
   }) async {
@@ -26,9 +28,9 @@ class AuthService {
         _firestore,
         credencial.user!.uid,
       ).createMainFolder();
-      return 'Account created successfully';
+      return null;
     } on FirebaseException catch (e) {
-      return e.message!;
+      return traduzErroDeAuth(e);
     }
   }
 
@@ -40,7 +42,7 @@ class AuthService {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
     } on FirebaseException catch (e) {
-      feedback = e.message;
+      feedback = traduzErroDeAuth(e);
     }
     return feedback;
   }
@@ -49,7 +51,7 @@ class AuthService {
     try {
       await _auth.sendPasswordResetEmail(email: email);
     } on FirebaseAuthException catch (e) {
-      return e.message!;
+      return traduzErroDeAuth(e);
     }
     return null;
   }
@@ -58,7 +60,7 @@ class AuthService {
     try {
       await _auth.signOut();
     } on FirebaseAuthException catch (e) {
-      return e.message;
+      return traduzErroDeAuth(e);
     }
     return null;
   }
@@ -66,13 +68,13 @@ class AuthService {
   Future<String?> deleteAccount() async {
     final usuario = _auth.currentUser;
     if (usuario == null) {
-      return 'No signed in user';
+      return 'Nenhum usuário conectado.';
     }
     try {
       await FirestoreService(_firestore, usuario.uid).deleteAllDocs();
       await usuario.delete();
     } on FirebaseException catch (e) {
-      return e.message;
+      return traduzErroDeAuth(e);
     }
     return null;
   }
@@ -81,7 +83,7 @@ class AuthService {
     try {
       await _auth.currentUser?.reload();
     } on FirebaseException catch (e) {
-      return e.message;
+      return traduzErroDeAuth(e);
     }
     return null;
   }
@@ -89,7 +91,7 @@ class AuthService {
   Future<String?> reauthentication(String password) async {
     final usuario = _auth.currentUser;
     if (usuario?.email == null) {
-      return 'No signed in user';
+      return 'Nenhum usuário conectado.';
     }
     try {
       final credencial = EmailAuthProvider.credential(
@@ -98,7 +100,7 @@ class AuthService {
       );
       await usuario.reauthenticateWithCredential(credencial);
     } on FirebaseException catch (e) {
-      return e.message;
+      return traduzErroDeAuth(e);
     }
     return null;
   }

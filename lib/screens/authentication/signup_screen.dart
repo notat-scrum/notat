@@ -178,7 +178,7 @@ class _SignUpDetailsState extends ConsumerState<SignUpDetails> {
                   onTap: () async {
                     if (_key.currentState!.validate() == true) {
                       changeIsWaiting();
-                      final String auth = await ref
+                      final String? erro = await ref
                           .read(authServiceProvider)
                           .createUser(
                             email: emailController.text,
@@ -188,11 +188,13 @@ class _SignUpDetailsState extends ConsumerState<SignUpDetails> {
                       changeIsWaiting();
                       CustomSnackBar.show(
                         context,
-                        auth,
+                        erro ?? 'Conta criada. Confira seu e-mail.',
                         const Duration(seconds: 3),
                       );
-
-                      Navigator.of(context).pop();
+                      // so sai da tela quando a conta foi mesmo criada
+                      if (erro == null) {
+                        Navigator.of(context).pop();
+                      }
                     }
                   },
                   isRounded: true,
