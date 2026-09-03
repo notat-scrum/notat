@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:notat/providers/auth_provider.dart';
+import 'package:notat/resources/firstore_folder_methods.dart';
 import 'package:notat/widgets/reusedComponents/input_text_field.dart';
 import 'package:notat/widgets/reusedComponents/snackbar.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -61,10 +62,13 @@ class FolderDialog extends ConsumerWidget {
           hintText: 'Folder Name',
           isPassword: false,
           validator: (val) {
-            if (!(keys.contains(val)) && (val != null && val.isNotEmpty)) {
-              return null;
+            if (val == null || !FirestoreFolderService.nomeValido(val)) {
+              return 'Invalid name';
             }
-            return 'Find another name';
+            if (keys.contains(val)) {
+              return 'Find another name';
+            }
+            return null;
           },
           keyboardType: TextInputType.text,
           toNextField: false,

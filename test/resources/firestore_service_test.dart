@@ -73,7 +73,6 @@ void main() {
           document: '[{"insert":"novo\\n"}]',
           searchableDocument: 'novo',
           title: 'Editada',
-          previousFolder: 'All',
           folder: 'Trabalho',
           noteUid: noteUid,
           date: DateTime(2026, 9, 4),
@@ -95,7 +94,7 @@ void main() {
       );
       final noteUid = (await notas(db).get()).docs.single.id;
 
-      await servico.deleteNote(uid: noteUid, folder: 'All');
+      await servico.deleteNote(uid: noteUid);
 
       expect((await notas(db).get()).docs, isEmpty);
     });

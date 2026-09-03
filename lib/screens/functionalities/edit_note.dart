@@ -43,7 +43,6 @@ class EditNoteState extends ConsumerState<EditNote> {
             if (nota == null) return ErrorPage();
             _titleController = TextEditingController(text: nota.title);
             selected.value = nota.folderId;
-            final previousFolder = nota.folderId;
             _controller = editor.QuillController(
               document: editor.Document.fromJson(jsonDecode(nota.document)),
               selection: const TextSelection.collapsed(offset: 0),
@@ -66,8 +65,7 @@ class EditNoteState extends ConsumerState<EditNote> {
                               final erro = await ref
                                   .read(firestoreServiceProvider)
                                   .updateDocument(
-                                    previousFolder: previousFolder,
-                                    folder: selected.value,
+                                    folder: selected.value ?? nota.folderId,
                                     searchableDocument: plainText,
                                     document: json,
                                     title: _titleController.text,

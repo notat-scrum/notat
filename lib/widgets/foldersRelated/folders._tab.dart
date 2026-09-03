@@ -35,12 +35,7 @@ class _FoldersTabState extends ConsumerState<FoldersTab> {
           builder: ((context, ref, child) {
             final streamProv = ref.watch(folderProvider);
             return streamProv.when(
-              data: ((snapshot) {
-                final data = snapshot.data();
-                if (data == null) {
-                  return const ErrorPage();
-                }
-                final keys = data.keys.toList();
+              data: ((keys) {
                 return GridView.builder(
                   physics: BouncingScrollPhysics(),
                   itemCount: keys.length + 1,

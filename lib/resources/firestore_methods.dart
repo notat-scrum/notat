@@ -13,6 +13,9 @@ class FirestoreService {
   final FirestoreFolderService firestoreFolder;
   final String userUid;
 
+  CollectionReference<Map<String, dynamic>> get _notes =>
+      _firestore.collection('users').doc(userUid).collection('notes');
+
   Future<String?> addDocument({
     required String document,
     required String title,
@@ -37,10 +40,7 @@ class FirestoreService {
       // o set() so completa quando o servidor confirma; sem internet ele fica
       // pendente para sempre e a tela travaria. O SDK ja guarda a escrita
       // localmente e sincroniza sozinho quando a conexao volta.
-      unawaited(
-        _firestore.collection(userUid).doc(uid).set(note.toFirestore()),
-      );
-      await firestoreFolder.addDocToFolder(folderField: folder, noteUid: uid);
+      unawaited(_notes.doc(uid).set(note.toFirestore()));
     } on FirebaseException catch (e) {
       return e.message!;
     }
@@ -51,8 +51,7 @@ class FirestoreService {
     required String document,
     required String searchableDocument,
     required String title,
-    required String previousFolder,
-    required folder,
+    required String folder,
     required String noteUid,
     required DateTime date,
   }) async {
@@ -69,23 +68,15 @@ class FirestoreService {
     );
 
     try {
-      unawaited(
-        _firestore.collection(userUid).doc(noteUid).set(note.toFirestore()),
-      );
-      await firestoreFolder.updateFolder(
-        folderField: folder,
-        noteUid: noteUid,
-        previousFolder: previousFolder,
-      );
+      unawaited(_notes.doc(noteUid).set(note.toFirestore()));
     } on FirebaseException catch (e) {
       return e.message!;
     }
-
     return null;
   }
 
   Future<Note?> getNote({required String uid}) async {
-    final snapshot = await _firestore.collection(userUid).doc(uid).get();
+    final snapshot = await _notes.doc(uid).get();
     if (!snapshot.exists) {
       return null;
     }
@@ -93,18 +84,8 @@ class FirestoreService {
   }
 
   Future<String?> clearAllNotes() async {
-    final folder = _firestore.collection(userUid).doc('folders');
-
     try {
-      final documentos = await _firestore.collection(userUid).get();
-      final lote = _firestore.batch();
-      for (final ds in documentos.docs) {
-        if (ds.reference != folder) {
-          lote.delete(ds.reference);
-        }
-      }
-      await lote.commit();
-      await firestoreFolder.clearFolders();
+      await _apagaEmLote(await _notes.get());
     } on FirebaseException catch (e) {
       return e.message;
     }
@@ -113,31 +94,18 @@ class FirestoreService {
 
   Future<String?> deleteDocsOfFolder(String folder) async {
     try {
-      final documentos = await _firestore
-          .collection(userUid)
-          .where('folder', isEqualTo: folder)
-          .get();
-      final lote = _firestore.batch();
-      for (final ds in documentos.docs) {
-        lote.delete(ds.reference);
-      }
-      await lote.commit();
+      await _apagaEmLote(
+        await _notes.where('folderId', isEqualTo: folder).get(),
+      );
     } on FirebaseException catch (e) {
       return e.message;
     }
     return null;
   }
 
-  Future<String?> deleteNote({
-    required String uid,
-    required String folder,
-  }) async {
+  Future<String?> deleteNote({required String uid}) async {
     try {
-      await _firestore.collection(userUid).doc(uid).delete();
-      await firestoreFolder.deleteDocFromFolder(
-        folderField: folder,
-        noteUid: uid,
-      );
+      await _notes.doc(uid).delete();
     } on FirebaseException catch (e) {
       return e.message;
     }
@@ -146,15 +114,22 @@ class FirestoreService {
 
   Future<String?> deleteAllDocs() async {
     try {
-      final documentos = await _firestore.collection(userUid).get();
-      final lote = _firestore.batch();
-      for (final ds in documentos.docs) {
-        lote.delete(ds.reference);
-      }
-      await lote.commit();
+      await _apagaEmLote(await _notes.get());
+      await _apagaEmLote(await firestoreFolder.folders.get());
     } on FirebaseException catch (e) {
       return e.message;
     }
     return null;
+  }
+
+  Future<void> _apagaEmLote(QuerySnapshot<Map<String, dynamic>> documentos) {
+    if (documentos.docs.isEmpty) {
+      return Future.value();
+    }
+    final lote = _firestore.batch();
+    for (final documento in documentos.docs) {
+      lote.delete(documento.reference);
+    }
+    return lote.commit();
   }
 }

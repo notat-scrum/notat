@@ -88,7 +88,7 @@ class _NoteCardsState extends ConsumerState<NoteCards> {
                   onPressed: () async {
                     await ref
                         .read(firestoreServiceProvider)
-                        .deleteNote(uid: nota.uid, folder: nota.folderId);
+                        .deleteNote(uid: nota.uid);
                   },
                   backgroundColor: Colors.redAccent,
                 ),

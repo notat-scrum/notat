@@ -9,7 +9,9 @@ final notesProvider = StreamProvider<List<Note>>((ref) {
   }
   return ref
       .watch(firebaseFirestoreProvider)
-      .collection(uid)
+      .collection('users')
+      .doc(uid)
+      .collection('notes')
       .orderBy('date', descending: true)
       .snapshots()
       .map((consulta) => consulta.docs.map(Note.fromFirestore).toList());
@@ -25,8 +27,10 @@ final notesInFolderProvider = StreamProvider.family<List<Note>, String>((
   }
   return ref
       .watch(firebaseFirestoreProvider)
-      .collection(uid)
-      .where('folder', isEqualTo: folder)
+      .collection('users')
+      .doc(uid)
+      .collection('notes')
+      .where('folderId', isEqualTo: folder)
       .snapshots()
       .map((consulta) => consulta.docs.map(Note.fromFirestore).toList());
 });

@@ -17,7 +17,7 @@ class Note {
       title: dados['title'] as String? ?? 'untitled',
       document: dados['document'] as String? ?? '',
       searchableDocument: dados['searchableDocument'] as String? ?? '',
-      folderId: dados['folder'] as String? ?? 'All',
+      folderId: dados['folderId'] as String? ?? 'All',
       date: (dados['date'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
@@ -35,7 +35,7 @@ class Note {
       'title': title,
       'document': document,
       'searchableDocument': searchableDocument,
-      'folder': folderId,
+      'folderId': folderId,
       'date': Timestamp.fromDate(date),
     };
   }

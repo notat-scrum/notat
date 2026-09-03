@@ -7,21 +7,23 @@ class FirestoreFolderService {
   final FirebaseFirestore _firestore;
   final String userUid;
 
-  Future<String?> createMainFolder() async {
-    //create the folder 'All' so you have a document to start with
-    List<String> notes = [];
-    try {
-      await _firestore.collection(userUid).doc('folders').set({'All': notes});
-    } on FirebaseException catch (e) {
-      return e.message;
-    }
-    return null;
-  }
+  /// O id do documento e o proprio nome da pasta, que e o que as notas guardam
+  /// em folderId. Por isso o nome nao pode conter barra: ela dividiria o
+  /// caminho no Firestore.
+  CollectionReference<Map<String, dynamic>> get folders =>
+      _firestore.collection('users').doc(userUid).collection('folders');
+
+  static bool nomeValido(String name) =>
+      name.isNotEmpty && !name.contains('/') && name.trim() == name;
+
+  Future<String?> createMainFolder() => createFolder('All');
 
   Future<String?> createFolder(String name) async {
-    List<String> notes = [];
+    if (!nomeValido(name)) {
+      return 'Invalid folder name';
+    }
     try {
-      await _firestore.collection(userUid).doc('folders').update({name: notes});
+      await folders.doc(name).set({'name': name, 'createdAt': Timestamp.now()});
     } on FirebaseException catch (e) {
       return e.message;
     }
@@ -29,84 +31,12 @@ class FirestoreFolderService {
   }
 
   Future<String?> deleteFolder(String name) async {
-    final updates = <String, dynamic>{name: FieldValue.delete()};
     if (name == 'All') {
       return null;
     }
     try {
-      await _firestore.collection(userUid).doc('folders').update(updates);
       await FirestoreService(_firestore, userUid).deleteDocsOfFolder(name);
-    } on FirebaseException catch (e) {
-      return e.message;
-    }
-    return null;
-  }
-
-  Future<String?> addDocToFolder({
-    required String folderField,
-    required String noteUid,
-  }) async {
-    try {
-      _firestore.collection(userUid).doc('folders').update({
-        folderField: FieldValue.arrayUnion([noteUid]),
-      });
-    } on FirebaseException catch (e) {
-      return e.message;
-    }
-    return null;
-  }
-
-  Future<String?> updateFolder({
-    required String folderField,
-    required String noteUid,
-    required String previousFolder,
-  }) async {
-    try {
-      //if the user is updating the folder, delete the note uid from the
-      // previous folder and add the note uid to the new folder, otherwise don't change anything
-      if (previousFolder != folderField) {
-        await _firestore.collection(userUid).doc('folders').update({
-          previousFolder: FieldValue.arrayRemove([noteUid]),
-        });
-
-        await _firestore.collection(userUid).doc('folders').update({
-          folderField: FieldValue.arrayUnion([noteUid]),
-        });
-      }
-    } on FirebaseException catch (e) {
-      return e.message;
-    }
-    return null;
-  }
-
-  Future<String?> deleteDocFromFolder({
-    required String folderField,
-    required String noteUid,
-  }) async {
-    try {
-      _firestore.collection(userUid).doc('folders').update({
-        folderField: FieldValue.arrayRemove([noteUid]),
-      });
-    } on FirebaseException catch (e) {
-      return e.message;
-    }
-    return null;
-  }
-
-  Future<String?> clearFolders() async {
-    //Go inside the 'folder' doc, and set all folders to []
-    try {
-      final documento = await _firestore
-          .collection(userUid)
-          .doc('folders')
-          .get();
-      final vazias = <String, dynamic>{
-        for (final chave in documento.data()?.keys ?? const <String>[])
-          chave: <String>[],
-      };
-      if (vazias.isNotEmpty) {
-        await _firestore.collection(userUid).doc('folders').update(vazias);
-      }
+      await folders.doc(name).delete();
     } on FirebaseException catch (e) {
       return e.message;
     }
