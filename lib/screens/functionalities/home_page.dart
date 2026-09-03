@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:notat/providers/auth_provider.dart';
-import 'package:notat/screens/authentication/introduction_screen.dart';
+import 'package:notat/screens/wrapper.dart';
 import 'package:notat/screens/functionalities/create_note.dart';
 import 'package:notat/widgets/delete_account_dialog.dart';
 import 'package:notat/widgets/reusedComponents/animation_transition.dart';
@@ -90,7 +90,10 @@ class _HomePageState extends ConsumerState<HomePage>
                             Duration(seconds: 2),
                           );
                         }
-                        FadeTrans(translateTo: IntroductionScreen());
+                        Navigator.of(context).pushAndRemoveUntil(
+                          FadeTrans(translateTo: const Wrapper()),
+                          (rota) => false,
+                        );
                       },
                       value: 2,
                       child: const Text('Sign out'),

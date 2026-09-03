@@ -5,7 +5,9 @@ import 'package:notat/providers/auth_provider.dart';
 final notesProvider = StreamProvider<List<Note>>((ref) {
   final uid = ref.watch(currentUidProvider);
   if (uid == null) {
-    return const Stream.empty();
+    // deslogado nao e carregando: Stream.empty nunca emite e a tela ficaria
+    // presa no indicador de progresso
+    return Stream.value(const <Note>[]);
   }
   return ref
       .watch(firebaseFirestoreProvider)
@@ -23,7 +25,9 @@ final notesInFolderProvider = StreamProvider.family<List<Note>, String>((
 ) {
   final uid = ref.watch(currentUidProvider);
   if (uid == null) {
-    return const Stream.empty();
+    // deslogado nao e carregando: Stream.empty nunca emite e a tela ficaria
+    // presa no indicador de progresso
+    return Stream.value(const <Note>[]);
   }
   return ref
       .watch(firebaseFirestoreProvider)

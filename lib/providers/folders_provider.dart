@@ -6,7 +6,9 @@ import 'package:notat/providers/auth_provider.dart';
 final folderProvider = StreamProvider<List<String>>((ref) {
   final uid = ref.watch(currentUidProvider);
   if (uid == null) {
-    return const Stream.empty();
+    // deslogado nao e carregando: Stream.empty nunca emite e a tela ficaria
+    // presa no indicador de progresso
+    return Stream.value(const <String>[]);
   }
   return ref
       .watch(firebaseFirestoreProvider)

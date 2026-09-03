@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:notat/providers/auth_provider.dart';
-import 'package:notat/screens/authentication/introduction_screen.dart';
+import 'package:notat/screens/wrapper.dart';
 import 'package:notat/widgets/reusedComponents/animation_transition.dart';
 import 'package:notat/widgets/reusedComponents/input_text_field.dart';
 import 'package:notat/widgets/reusedComponents/snackbar.dart';
@@ -73,7 +73,11 @@ class _DeleteAccountDialogState extends ConsumerState<DeleteAccountDialog> {
               } else {
                 await auth.deleteAccount();
                 if (!context.mounted) return;
-                FadeTrans(translateTo: IntroductionScreen());
+                Navigator.of(context).pushAndRemoveUntil(
+                  FadeTrans(translateTo: const Wrapper()),
+                  (rota) => false,
+                );
+                return;
               }
               Navigator.pop(context);
             }
