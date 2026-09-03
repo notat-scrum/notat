@@ -3,8 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:notat/providers/auth_provider.dart';
-import 'package:notat/screens/functionalities/home_page.dart';
-import 'package:notat/widgets/reusedComponents/animation_transition.dart';
 import 'package:notat/widgets/reusedComponents/sign_button.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
@@ -55,15 +53,8 @@ class _VerifyEmailState extends ConsumerState<VerifyEmail> {
     }
   }
 
-  Future<void> sendEmailVerification() async {
-    final servico = ref.read(authServiceProvider);
-    if (servico.isVerified) {
-      Navigator.of(context)
-          .pushReplacement(FadeTrans(translateTo: const HomePage()));
-    } else {
-      await servico.sendEmailVerification();
-    }
-  }
+  Future<void> reenviarEmail() =>
+      ref.read(authServiceProvider).sendEmailVerification();
 
   void _iniciarContagem() {
     _contagem?.cancel();
@@ -81,7 +72,10 @@ class _VerifyEmailState extends ConsumerState<VerifyEmail> {
 
   @override
   void initState() {
-    sendEmailVerification();
+    // esta folha so aparece no login de quem ainda nao verificou, entao manda
+    // um link novo: o do cadastro pode ter se perdido ou expirado
+    checkVerification();
+    reenviarEmail();
     _iniciarContagem();
     timer = Timer.periodic(const Duration(seconds: 5), (timer) async {
       checkVerification();
@@ -147,7 +141,7 @@ class _VerifyEmailState extends ConsumerState<VerifyEmail> {
                 isDisabled: isDismised,
                 onTap: () async {
                   changeButtonState();
-                  sendEmailVerification();
+                  await reenviarEmail();
                   _iniciarContagem();
                 },
                 child: const Text("Resend Email"),

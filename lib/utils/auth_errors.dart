@@ -6,26 +6,26 @@ import 'package:firebase_auth/firebase_auth.dart';
 String traduzErroDeAuth(FirebaseException erro) {
   switch (erro.code) {
     case 'email-already-in-use':
-      return 'Este e-mail já está cadastrado.';
+      return 'This email is already registered.';
     case 'invalid-email':
-      return 'E-mail inválido.';
+      return 'Invalid email address.';
     case 'weak-password':
-      return 'Senha fraca. Use ao menos seis caracteres.';
+      return 'Weak password. Use at least six characters.';
     case 'user-not-found':
     case 'wrong-password':
     case 'invalid-credential':
-      return 'E-mail ou senha incorretos.';
+      return 'Wrong email or password.';
     case 'user-disabled':
-      return 'Esta conta foi desativada.';
+      return 'This account has been disabled.';
     case 'too-many-requests':
-      return 'Muitas tentativas. Tente de novo em alguns minutos.';
+      return 'Too many attempts. Try again in a few minutes.';
     case 'network-request-failed':
-      return 'Sem conexão com a internet.';
+      return 'No internet connection.';
     case 'requires-recent-login':
-      return 'Entre de novo na conta antes de repetir esta ação.';
+      return 'Sign in again before repeating this action.';
     case 'operation-not-allowed':
-      return 'Esta forma de login está desativada no projeto.';
+      return 'This sign-in method is disabled for this project.';
     default:
-      return erro.message ?? 'Não foi possível concluir a operação.';
+      return erro.message ?? 'Could not complete the operation.';
   }
 }

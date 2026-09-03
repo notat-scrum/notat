@@ -3,13 +3,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:notat/utils/auth_errors.dart';
 
 void main() {
-  test('traduz o codigo conhecido para pt-BR', () {
+  test('traduz o codigo do Firebase para a mensagem do app', () {
     final erro = FirebaseAuthException(
       code: 'email-already-in-use',
       message: 'The email address is already in use by another account.',
     );
 
-    expect(traduzErroDeAuth(erro), 'Este e-mail já está cadastrado.');
+    expect(traduzErroDeAuth(erro), 'This email is already registered.');
   });
 
   test('nao vaza a diferenca entre e-mail e senha errados', () {

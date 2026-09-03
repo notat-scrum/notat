@@ -28,6 +28,9 @@ class AuthService {
         _firestore,
         credencial.user!.uid,
       ).createMainFolder();
+      // enviado aqui para a tela poder dizer que o e-mail saiu; a tela de
+      // verificacao so reenvia sob pedido
+      await credencial.user!.sendEmailVerification();
       return null;
     } on FirebaseException catch (e) {
       return traduzErroDeAuth(e);
@@ -68,7 +71,7 @@ class AuthService {
   Future<String?> deleteAccount() async {
     final usuario = _auth.currentUser;
     if (usuario == null) {
-      return 'Nenhum usuário conectado.';
+      return 'No signed in user.';
     }
     try {
       await FirestoreService(_firestore, usuario.uid).deleteAllDocs();
@@ -91,7 +94,7 @@ class AuthService {
   Future<String?> reauthentication(String password) async {
     final usuario = _auth.currentUser;
     if (usuario?.email == null) {
-      return 'Nenhum usuário conectado.';
+      return 'No signed in user.';
     }
     try {
       final credencial = EmailAuthProvider.credential(

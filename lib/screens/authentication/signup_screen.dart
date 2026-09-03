@@ -188,7 +188,7 @@ class _SignUpDetailsState extends ConsumerState<SignUpDetails> {
                       changeIsWaiting();
                       CustomSnackBar.show(
                         context,
-                        erro ?? 'Conta criada. Confira seu e-mail.',
+                        erro ?? 'Account created. Check your inbox to verify.',
                         const Duration(seconds: 3),
                       );
                       // so sai da tela quando a conta foi mesmo criada
