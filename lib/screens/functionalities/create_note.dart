@@ -69,7 +69,7 @@ class _CreateNoteState extends ConsumerState<CreateNote> {
                     editNoteMod: false,
                     titleController: _titleController,
                     selected: selected,
-                    snapshot: null,
+                    note: null,
                   ),
                   Expanded(
                     child: editor.QuillEditor(

@@ -22,7 +22,7 @@ class FirestoreService {
     final String uid = const Uuid().v4();
     final internet = await Connection.checkInternet();
     final Note note = Note(
-      folder: folder,
+      folderId: folder,
       document: document,
       searchableDocument: searchableDocument.toLowerCase().replaceAll(
         '\\n',
@@ -37,7 +37,7 @@ class FirestoreService {
       if (!internet) {
         return 'No internet connection';
       }
-      await _firestore.collection(userUid).doc(uid).set(note.toJson());
+      await _firestore.collection(userUid).doc(uid).set(note.toFirestore());
       await firestoreFolder.addDocToFolder(folderField: folder, noteUid: uid);
     } on FirebaseException catch (e) {
       return e.message!;
@@ -56,7 +56,7 @@ class FirestoreService {
   }) async {
     final internet = await Connection.checkInternet();
     final Note note = Note(
-      folder: folder,
+      folderId: folder,
       searchableDocument: searchableDocument.toLowerCase().replaceAll(
         '\\n',
         ' ',
@@ -71,7 +71,7 @@ class FirestoreService {
       if (!internet) {
         return 'No internet connection';
       }
-      await _firestore.collection(userUid).doc(noteUid).set(note.toJson());
+      await _firestore.collection(userUid).doc(noteUid).set(note.toFirestore());
       await firestoreFolder.updateFolder(
         folderField: folder,
         noteUid: noteUid,
@@ -84,9 +84,12 @@ class FirestoreService {
     return null;
   }
 
-  Future<Map<String, dynamic>?> getNote({required String uid}) async {
+  Future<Note?> getNote({required String uid}) async {
     final snapshot = await _firestore.collection(userUid).doc(uid).get();
-    return snapshot.data();
+    if (!snapshot.exists) {
+      return null;
+    }
+    return Note.fromFirestore(snapshot);
   }
 
   Future<String?> clearAllNotes() async {

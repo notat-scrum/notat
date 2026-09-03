@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:notat/models/note.dart';
 import 'package:notat/providers/auth_provider.dart';
 import 'package:notat/screens/errorAndLoading/error_screen.dart';
 import 'package:notat/screens/functionalities/edit_note.dart';
@@ -8,7 +9,6 @@ import 'package:notat/screens/errorAndLoading/empty_result.dart';
 import 'package:notat/screens/errorAndLoading/loading_screen.dart';
 import 'package:notat/widgets/reusedComponents/animation_transition.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -18,7 +18,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:jiffy/jiffy.dart';
 
 class NoteCards extends ConsumerStatefulWidget {
-  final AsyncValue<QuerySnapshot<Map<String, dynamic>>> snapshot;
+  final AsyncValue<List<Note>> snapshot;
   const NoteCards(this.snapshot, {super.key});
 
   @override
@@ -29,21 +29,21 @@ class _NoteCardsState extends ConsumerState<NoteCards> {
   @override
   Widget build(BuildContext context) {
     return widget.snapshot.when(
-      data: ((snapshot) {
-        if (snapshot.docs.isEmpty) {
+      data: ((notas) {
+        if (notas.isEmpty) {
           return EmptyResult();
         }
         return MasonryGridView.builder(
           physics: const BouncingScrollPhysics(),
           mainAxisSpacing: 15,
           crossAxisSpacing: 10,
-          itemCount: snapshot.docs.length,
+          itemCount: notas.length,
           gridDelegate: const SliverSimpleGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
           ),
           itemBuilder: ((gridViewContegyxt, index) {
-            var myData = snapshot.docs[index];
-            var json = jsonDecode(myData['document']);
+            final nota = notas[index];
+            final json = jsonDecode(nota.document);
             final controller = quill.QuillController(
               document: quill.Document.fromJson(json),
               selection: const TextSelection.collapsed(offset: 0),
@@ -59,9 +59,10 @@ class _NoteCardsState extends ConsumerState<NoteCards> {
               animateMenuItems: false,
               blurBackgroundColor: Theme.of(context).scaffoldBackgroundColor,
               onPressed: () {
-                Navigator.of(context, rootNavigator: true).push(
-                  FadeTrans(translateTo: EditNote(noteUid: myData['uid'])),
-                );
+                Navigator.of(
+                  context,
+                  rootNavigator: true,
+                ).push(FadeTrans(translateTo: EditNote(noteUid: nota.uid)));
               },
               menuItems: [
                 FocusedMenuItem(
@@ -71,9 +72,10 @@ class _NoteCardsState extends ConsumerState<NoteCards> {
                   ),
                   title: const Text('Edit'),
                   onPressed: () {
-                    Navigator.of(context, rootNavigator: true).push(
-                      FadeTrans(translateTo: EditNote(noteUid: myData['uid'])),
-                    );
+                    Navigator.of(
+                      context,
+                      rootNavigator: true,
+                    ).push(FadeTrans(translateTo: EditNote(noteUid: nota.uid)));
                   },
                   backgroundColor: const Color.fromARGB(255, 57, 55, 78),
                 ),
@@ -86,10 +88,7 @@ class _NoteCardsState extends ConsumerState<NoteCards> {
                   onPressed: () async {
                     await ref
                         .read(firestoreServiceProvider)
-                        .deleteNote(
-                          uid: myData['uid'],
-                          folder: myData['folder'],
-                        );
+                        .deleteNote(uid: nota.uid, folder: nota.folderId);
                   },
                   backgroundColor: Colors.redAccent,
                 ),
@@ -108,7 +107,7 @@ class _NoteCardsState extends ConsumerState<NoteCards> {
                     child: Column(
                       children: [
                         AutoSizeText(
-                          myData['title'],
+                          nota.title,
                           //softWrap: true,
                           minFontSize: 16,
                           maxLines: 4,
@@ -152,8 +151,7 @@ class _NoteCardsState extends ConsumerState<NoteCards> {
                         Row(
                           children: [
                             Text(
-                              Jiffy.parseFromDateTime(myData['date'].toDate())
-                                  .MMMd,
+                              Jiffy.parseFromDateTime(nota.date).MMMd,
                               style: GoogleFonts.roboto(
                                 fontSize: 12,
                                 color: const Color.fromARGB(90, 255, 255, 255),
@@ -163,7 +161,7 @@ class _NoteCardsState extends ConsumerState<NoteCards> {
                             SizedBox(
                               width: 85,
                               child: Text(
-                                myData['folder'],
+                                nota.folderId,
                                 textAlign: TextAlign.end,
                                 overflow: TextOverflow.ellipsis,
                                 softWrap: true,

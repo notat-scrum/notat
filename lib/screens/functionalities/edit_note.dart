@@ -39,13 +39,13 @@ class EditNoteState extends ConsumerState<EditNote> {
         .when(
           error: ((error, stackTrace) => ErrorPage()),
           loading: (() => LoadingScreen()),
-          data: ((data) {
-            if (data == null) return ErrorPage();
-            _titleController = TextEditingController(text: data['title']);
-            selected.value = data['folder'];
-            final previousFolder = data['folder'];
+          data: ((nota) {
+            if (nota == null) return ErrorPage();
+            _titleController = TextEditingController(text: nota.title);
+            selected.value = nota.folderId;
+            final previousFolder = nota.folderId;
             _controller = editor.QuillController(
-              document: editor.Document.fromJson(jsonDecode(data['document'])),
+              document: editor.Document.fromJson(jsonDecode(nota.document)),
               selection: const TextSelection.collapsed(offset: 0),
             );
             return SafeArea(
@@ -89,7 +89,7 @@ class EditNoteState extends ConsumerState<EditNote> {
                             editNoteMod: true,
                             titleController: _titleController,
                             selected: selected,
-                            snapshot: data,
+                            note: nota,
                           ),
                           SizedBox(height: 5),
                           Expanded(

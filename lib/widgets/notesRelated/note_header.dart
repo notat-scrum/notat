@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:notat/models/note.dart';
 import 'package:notat/widgets/foldersRelated/folder_menu.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jiffy/jiffy.dart';
@@ -9,12 +10,12 @@ class NoteHeader extends StatelessWidget {
     required this._titleController,
     this.editNoteMod = false,
     required this.selected,
-    required this.snapshot,
+    required this.note,
   });
 
   final TextEditingController _titleController;
   final ValueNotifier<String?> selected;
-  final dynamic snapshot;
+  final Note? note;
   final bool editNoteMod;
   @override
   Widget build(BuildContext context) {
@@ -52,9 +53,9 @@ class NoteHeader extends StatelessWidget {
               Container(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  snapshot == null
+                  note == null
                       ? 'Date: ${Jiffy.parseFromDateTime(DateTime.now()).yMMMEdjm} |'
-                      : 'Last update: ${Jiffy.parseFromDateTime(snapshot['date'].toDate()).yMMMEdjm} |',
+                      : 'Last update: ${Jiffy.parseFromDateTime(note!.date).yMMMEdjm} |',
                   style: GoogleFonts.ubuntu(
                     fontSize: 14,
                     color: Colors.white30,

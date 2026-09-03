@@ -1,10 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:notat/models/note.dart';
 import 'package:notat/providers/auth_provider.dart';
 
-typedef NoteSnapshot = QuerySnapshot<Map<String, dynamic>>;
-
-final notesProvider = StreamProvider<NoteSnapshot>((ref) {
+final notesProvider = StreamProvider<List<Note>>((ref) {
   final uid = ref.watch(currentUidProvider);
   if (uid == null) {
     return const Stream.empty();
@@ -13,10 +11,11 @@ final notesProvider = StreamProvider<NoteSnapshot>((ref) {
       .watch(firebaseFirestoreProvider)
       .collection(uid)
       .orderBy('date', descending: true)
-      .snapshots();
+      .snapshots()
+      .map((consulta) => consulta.docs.map(Note.fromFirestore).toList());
 });
 
-final notesInFolderProvider = StreamProvider.family<NoteSnapshot, String>((
+final notesInFolderProvider = StreamProvider.family<List<Note>, String>((
   ref,
   folder,
 ) {
@@ -28,9 +27,10 @@ final notesInFolderProvider = StreamProvider.family<NoteSnapshot, String>((
       .watch(firebaseFirestoreProvider)
       .collection(uid)
       .where('folder', isEqualTo: folder)
-      .snapshots();
+      .snapshots()
+      .map((consulta) => consulta.docs.map(Note.fromFirestore).toList());
 });
 
-final noteProvider = FutureProvider.family<Map<String, dynamic>?, String>(
+final noteProvider = FutureProvider.family<Note?, String>(
   (ref, uid) => ref.watch(firestoreServiceProvider).getNote(uid: uid),
 );
