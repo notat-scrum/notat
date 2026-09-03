@@ -7,13 +7,26 @@ import 'package:notat/widgets/reusedComponents/animation_transition.dart';
 import 'package:notat/widgets/reusedComponents/input_text_field.dart';
 import 'package:notat/widgets/reusedComponents/snackbar.dart';
 
-class DeleteAccountDialog extends ConsumerWidget {
-  final TextEditingController _controller = TextEditingController();
-  final _key = GlobalKey<FormState>();
-  DeleteAccountDialog({super.key});
+class DeleteAccountDialog extends ConsumerStatefulWidget {
+  const DeleteAccountDialog({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DeleteAccountDialog> createState() =>
+      _DeleteAccountDialogState();
+}
+
+class _DeleteAccountDialogState extends ConsumerState<DeleteAccountDialog> {
+  final TextEditingController _controller = TextEditingController();
+  final _key = GlobalKey<FormState>();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final auth = ref.read(authServiceProvider);
     return AlertDialog(
       title: Text('Delete Account'),

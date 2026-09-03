@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:notat/models/note.dart';
 import 'package:notat/providers/auth_provider.dart';
 import 'package:notat/providers/note_provider.dart';
 import 'package:notat/screens/errorAndLoading/error_screen.dart';
@@ -20,16 +21,38 @@ class EditNote extends ConsumerStatefulWidget {
 }
 
 class EditNoteState extends ConsumerState<EditNote> {
-  ValueNotifier<String?> selected = ValueNotifier(null);
-  late TextEditingController _titleController;
-  late editor.QuillController _controller;
-  bool showEditor = false;
+  final ValueNotifier<String?> selected = ValueNotifier(null);
+  final FocusNode _focusNode = FocusNode();
+  final ScrollController _scrollController = ScrollController();
+  TextEditingController? _titleController;
+  editor.QuillController? _controller;
+  String? _notaCarregada;
 
   @override
   void dispose() {
-    _controller.dispose();
-    _titleController.dispose();
+    _controller?.dispose();
+    _titleController?.dispose();
+    _focusNode.dispose();
+    _scrollController.dispose();
+    selected.dispose();
     super.dispose();
+  }
+
+  // build roda de novo a cada emissao do provider; sem esta guarda cada rebuild
+  // criava um par de controllers novo e vazava o anterior
+  void _preparaControllers(Note nota) {
+    if (_notaCarregada == nota.uid) {
+      return;
+    }
+    _titleController?.dispose();
+    _controller?.dispose();
+    _titleController = TextEditingController(text: nota.title);
+    _controller = editor.QuillController(
+      document: editor.Document.fromJson(jsonDecode(nota.document)),
+      selection: const TextSelection.collapsed(offset: 0),
+    );
+    selected.value = nota.folderId;
+    _notaCarregada = nota.uid;
   }
 
   @override
@@ -41,12 +64,8 @@ class EditNoteState extends ConsumerState<EditNote> {
           loading: (() => LoadingScreen()),
           data: ((nota) {
             if (nota == null) return ErrorPage();
-            _titleController = TextEditingController(text: nota.title);
-            selected.value = nota.folderId;
-            _controller = editor.QuillController(
-              document: editor.Document.fromJson(jsonDecode(nota.document)),
-              selection: const TextSelection.collapsed(offset: 0),
-            );
+            _preparaControllers(nota);
+            final controller = _controller!;
             return SafeArea(
               child: Scaffold(
                 body: CustomScrollView(
@@ -57,10 +76,10 @@ class EditNoteState extends ConsumerState<EditNote> {
                           CustomAppBar(
                             onPressed: () async {
                               String json = jsonEncode(
-                                _controller.document.toDelta().toJson(),
+                                controller.document.toDelta().toJson(),
                               );
                               String plainText = jsonEncode(
-                                _controller.document.toPlainText(),
+                                controller.document.toPlainText(),
                               );
                               final erro = await ref
                                   .read(firestoreServiceProvider)
@@ -68,7 +87,7 @@ class EditNoteState extends ConsumerState<EditNote> {
                                     folder: selected.value ?? nota.folderId,
                                     searchableDocument: plainText,
                                     document: json,
-                                    title: _titleController.text,
+                                    title: _titleController!.text,
                                     noteUid: widget.noteUid,
                                     date: DateTime.now(),
                                   );
@@ -85,16 +104,16 @@ class EditNoteState extends ConsumerState<EditNote> {
                           ),
                           NoteHeader(
                             editNoteMod: true,
-                            titleController: _titleController,
+                            titleController: _titleController!,
                             selected: selected,
                             note: nota,
                           ),
                           SizedBox(height: 5),
                           Expanded(
                             child: editor.QuillEditor(
-                              focusNode: FocusNode(),
-                              scrollController: ScrollController(),
-                              controller: _controller,
+                              focusNode: _focusNode,
+                              scrollController: _scrollController,
+                              controller: controller,
                               config: editor.QuillEditorConfig(
                                 scrollable: true,
                                 autoFocus: false,
@@ -104,7 +123,7 @@ class EditNoteState extends ConsumerState<EditNote> {
                             ),
                           ),
                           editor.QuillSimpleToolbar(
-                            controller: _controller,
+                            controller: controller,
                             config: editor.QuillSimpleToolbarConfig(
                               color: Theme.of(context).cardColor,
                               multiRowsDisplay: false,

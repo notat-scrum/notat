@@ -18,12 +18,17 @@ class CreateNote extends ConsumerStatefulWidget {
 class _CreateNoteState extends ConsumerState<CreateNote> {
   final editor.QuillController _controller = editor.QuillController.basic();
   final TextEditingController _titleController = TextEditingController();
-  ValueNotifier<String> selected = ValueNotifier('All');
+  final FocusNode _focusNode = FocusNode();
+  final ScrollController _scrollController = ScrollController();
+  final ValueNotifier<String> selected = ValueNotifier('All');
 
   @override
   void dispose() {
     _controller.dispose();
     _titleController.dispose();
+    _focusNode.dispose();
+    _scrollController.dispose();
+    selected.dispose();
     super.dispose();
   }
 
@@ -73,8 +78,8 @@ class _CreateNoteState extends ConsumerState<CreateNote> {
                   ),
                   Expanded(
                     child: editor.QuillEditor(
-                      focusNode: FocusNode(),
-                      scrollController: ScrollController(),
+                      focusNode: _focusNode,
+                      scrollController: _scrollController,
                       controller: _controller,
                       config: editor.QuillEditorConfig(
                         scrollable: true,

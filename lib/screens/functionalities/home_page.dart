@@ -28,6 +28,12 @@ class _HomePageState extends ConsumerState<HomePage>
   }
 
   @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
@@ -96,7 +102,7 @@ class _HomePageState extends ConsumerState<HomePage>
                           (() => showDialog(
                             context: context,
                             builder: (dialogContext) {
-                              return DeleteAccountDialog();
+                              return const DeleteAccountDialog();
                             },
                           )),
                         );

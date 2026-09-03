@@ -31,6 +31,13 @@ class ForgotPassword extends ConsumerStatefulWidget {
 class _ForgotPasswordState extends ConsumerState<ForgotPassword> {
   final _key = GlobalKey<FormState>();
   final TextEditingController _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
