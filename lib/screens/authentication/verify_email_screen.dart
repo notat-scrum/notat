@@ -122,8 +122,8 @@ class _VerifyEmailState extends ConsumerState<VerifyEmail> {
               ),
             ),
             const SizedBox(height: 10),
-            LottieBuilder.network(
-              'https://assets8.lottiefiles.com/packages/lf20_dd9wpbrh.json',
+            LottieBuilder.asset(
+              'assets/lf20_dd9wpbrh-email.json',
               height: 300,
               errorBuilder: (context, error, stackTrace) =>
                   Icon(Icons.error_outline_outlined),
