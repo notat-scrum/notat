@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:notat/resources/auth_methods.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:notat/providers/auth_provider.dart';
 import 'package:notat/resources/internet_connection.dart';
 import 'package:notat/screens/authentication/forgot_password.dart';
 import 'package:notat/screens/functionalities/home_page.dart';
@@ -63,14 +64,14 @@ class LoginScreen extends StatelessWidget {
   }
 }
 
-class LoginDetails extends StatefulWidget {
+class LoginDetails extends ConsumerStatefulWidget {
   const LoginDetails({super.key});
 
   @override
-  State<LoginDetails> createState() => _LoginDetailsState();
+  ConsumerState<LoginDetails> createState() => _LoginDetailsState();
 }
 
-class _LoginDetailsState extends State<LoginDetails> {
+class _LoginDetailsState extends ConsumerState<LoginDetails> {
   final _key = GlobalKey<FormState>();
   bool isWaiting = false;
   final TextEditingController emailController = TextEditingController();
@@ -79,7 +80,8 @@ class _LoginDetailsState extends State<LoginDetails> {
   Future<void> loginProcess() async {
     if (_key.currentState!.validate() == true) {
       changeIsWaiting();
-      final String? auth = await AuthService().loginUser(
+      final servico = ref.read(authServiceProvider);
+      final String? auth = await servico.loginUser(
         email: emailController.text,
         password: passwordController.text,
       );
@@ -88,7 +90,7 @@ class _LoginDetailsState extends State<LoginDetails> {
       if (auth == null) {
         //check if login is successful
 
-        if (AuthService().isVerified) {
+        if (servico.isVerified) {
           //Check if the user is Verified
           Navigator.of(context)
               .pushReplacement(FadeTrans(translateTo: const HomePage()));
@@ -167,12 +169,13 @@ class _LoginDetailsState extends State<LoginDetails> {
                   keyboardType: TextInputType.text,
                   hintText: 'Password',
                   isPassword: true,
+                  // a regra de forca vale so no cadastro: aplicada aqui, ela
+                  // tranca fora quem criou a conta antes da regra existir
                   validator: (text) {
-                    if (passwordRegExp.hasMatch(text!)) {
+                    if (text != null && text.isNotEmpty) {
                       return null;
                     }
-
-                    return 'Weak password, try adding a number, a letter or a special character';
+                    return 'Enter your password';
                   },
                 ),
               ),

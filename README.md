@@ -80,6 +80,50 @@ https://github.com/Dev-Salem/notat.git
 ```
 * Create a new Firebase project from the [console](https://console.firebase.google.com/).
 * Configure the Firebase for each platform.
+## Desenvolvimento
+
+O projeto usa uma versao fixa do Flutter, declarada em `.fvmrc`. Rode sempre por `fvm`:
+
+```
+fvm flutter pub get
+fvm flutter analyze --fatal-infos
+fvm flutter test
+```
+
+### Firebase local
+
+Por padrao o app fala com o projeto `notatmelhoria` na nuvem. Para desenvolver contra
+emuladores locais, sem sujar os dados reais:
+
+```
+JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 firebase emulators:start
+fvm flutter run --dart-define=USE_FIREBASE_EMULATOR=true
+```
+
+Os emuladores exigem JDK 21 ou superior (`sudo apt install openjdk-21-jdk-headless`). O
+`JAVA_HOME` do projeto aponta para o 17, que e o que o Gradle usa, por isso a variavel vai
+na frente do comando em vez de trocar o padrao da maquina.
+
+O painel dos emuladores fica em `http://localhost:4000`. O Auth emulado nao envia e-mail de
+verdade: o link de verificacao aparece no log do `firebase emulators:start`.
+
+Em aparelho fisico, `10.0.2.2` nao resolve. Passe o IP da maquina na rede local e acrescente
+esse mesmo IP em `android/app/src/debug/res/xml/network_security_config.xml`, senao o Android
+bloqueia a conexao por ser texto claro:
+
+```
+fvm flutter run --dart-define=USE_FIREBASE_EMULATOR=true --dart-define=FIREBASE_EMULATOR_HOST=192.168.0.10
+```
+
+### Regras de seguranca
+
+`firestore.rules` e `firestore.indexes.json` sao a fonte de verdade. Depois de mudar,
+publique com:
+
+```
+firebase deploy --only firestore:rules,firestore:indexes
+```
+
 ## Installation
 Notat isn't available on the app store yet, but you can try it by installing the apk from [here](https://www.mediafire.com/file/wuhhrx7jiali3pc/notat+v2.apk/file)
 ## Contributing

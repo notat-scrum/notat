@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -12,9 +14,22 @@ import 'package:notat/screens/wrapper.dart';
 import 'package:notat/utils/colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+const bool _usarEmulador = bool.fromEnvironment('USE_FIREBASE_EMULATOR');
+
+// Visto de dentro do emulador Android, a maquina do desenvolvedor e 10.0.2.2.
+// Em aparelho fisico, passe o IP da maquina na rede local.
+const String _hostEmulador = String.fromEnvironment(
+  'FIREBASE_EMULATOR_HOST',
+  defaultValue: '10.0.2.2',
+);
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  if (_usarEmulador) {
+    await FirebaseAuth.instance.useAuthEmulator(_hostEmulador, 9099);
+    FirebaseFirestore.instance.useFirestoreEmulator(_hostEmulador, 8080);
+  }
   if (kReleaseMode) {
     ErrorWidget.builder = (details) => const Material(
       color: Color.fromRGBO(31, 29, 43, 1),

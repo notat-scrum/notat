@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:notat/resources/auth_methods.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:notat/providers/auth_provider.dart';
 import 'package:notat/utils/regex.dart';
 import 'package:notat/widgets/reusedComponents/input_text_field.dart';
 import 'package:notat/widgets/reusedComponents/sign_button.dart';
@@ -20,16 +21,23 @@ Future<dynamic> forgotPassBottomSheet(BuildContext context) {
   );
 }
 
-class ForgotPassword extends StatefulWidget {
+class ForgotPassword extends ConsumerStatefulWidget {
   const ForgotPassword({super.key});
 
   @override
-  State<ForgotPassword> createState() => _ForgotPasswordState();
+  ConsumerState<ForgotPassword> createState() => _ForgotPasswordState();
 }
 
-class _ForgotPasswordState extends State<ForgotPassword> {
+class _ForgotPasswordState extends ConsumerState<ForgotPassword> {
   final _key = GlobalKey<FormState>();
   final TextEditingController _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -78,8 +86,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
               ),
             ),
             const SizedBox(height: 30),
-            LottieBuilder.network(
-              'https://assets8.lottiefiles.com/packages/lf20_dd9wpbrh.json',
+            LottieBuilder.asset(
+              'assets/lf20_dd9wpbrh-email.json',
               height: 300,
               errorBuilder: (context, error, stackTrace) =>
                   Icon(Icons.error_outline_outlined, size: 250),
@@ -94,9 +102,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 isRounded: true,
                 onTap: () async {
                   if (_key.currentState!.validate() == true) {
-                    final erro = await AuthService().restPassword(
-                      _controller.text,
-                    );
+                    final erro = await ref
+                        .read(authServiceProvider)
+                        .restPassword(_controller.text);
                     if (!context.mounted) return;
                     Navigator.of(context).pop();
                     CustomSnackBar.show(

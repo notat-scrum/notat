@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:notat/widgets/reusedComponents/snackbar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:notat/resources/auth_methods.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:notat/providers/auth_provider.dart';
 import 'package:notat/utils/regex.dart';
 import 'package:notat/widgets/reusedComponents/input_text_field.dart';
 import 'package:notat/widgets/reusedComponents/sign_button.dart';
@@ -75,14 +76,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 }
 
-class SignUpDetails extends StatefulWidget {
+class SignUpDetails extends ConsumerStatefulWidget {
   const SignUpDetails({super.key});
 
   @override
-  State<SignUpDetails> createState() => _SignUpDetailsState();
+  ConsumerState<SignUpDetails> createState() => _SignUpDetailsState();
 }
 
-class _SignUpDetailsState extends State<SignUpDetails> {
+class _SignUpDetailsState extends ConsumerState<SignUpDetails> {
   final _key = GlobalKey<FormState>();
   bool isWaiting = false;
   final TextEditingController emailController = TextEditingController();
@@ -177,19 +178,23 @@ class _SignUpDetailsState extends State<SignUpDetails> {
                   onTap: () async {
                     if (_key.currentState!.validate() == true) {
                       changeIsWaiting();
-                      final String auth = await AuthService().createUser(
-                        email: emailController.text,
-                        password: passwordController.text,
-                      );
+                      final String? erro = await ref
+                          .read(authServiceProvider)
+                          .createUser(
+                            email: emailController.text,
+                            password: passwordController.text,
+                          );
                       if (!context.mounted) return;
                       changeIsWaiting();
                       CustomSnackBar.show(
                         context,
-                        auth,
+                        erro ?? 'Account created. Check your inbox to verify.',
                         const Duration(seconds: 3),
                       );
-
-                      Navigator.of(context).pop();
+                      // so sai da tela quando a conta foi mesmo criada
+                      if (erro == null) {
+                        Navigator.of(context).pop();
+                      }
                     }
                   },
                   isRounded: true,

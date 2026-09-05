@@ -1,6 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:notat/resources/firestore_methods.dart';
+import 'package:notat/providers/note_provider.dart';
 import 'package:notat/widgets/notesRelated/note_cards.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -17,30 +16,12 @@ Future<dynamic> foldersBottomSheet(BuildContext context, String folder) {
   );
 }
 
-class InsideFolder extends StatefulWidget {
+class InsideFolder extends ConsumerWidget {
   final String folder;
   const InsideFolder(this.folder, {super.key});
 
   @override
-  State<InsideFolder> createState() => _InsideFolderState();
-}
-
-class _InsideFolderState extends State<InsideFolder> {
-  late final StreamProvider<QuerySnapshot<Map<String, dynamic>>> folderProvider;
-
-  @override
-  void initState() {
-    folderProvider = StreamProvider(
-      (ref) => FirebaseFirestore.instance
-          .collection(FirestoreService().userUid)
-          .where('folder', isEqualTo: widget.folder)
-          .snapshots(),
-    );
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       height: MediaQuery.of(context).size.height * 0.7,
       width: double.infinity,
@@ -52,14 +33,9 @@ class _InsideFolderState extends State<InsideFolder> {
         ),
       ),
       alignment: Alignment.bottomCenter,
-      child: Consumer(
-        builder: (context, ref, child) {
-          final streamProv = ref.watch(folderProvider);
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(25, 25, 25, 0),
-            child: NoteCards(streamProv),
-          );
-        },
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(25, 25, 25, 0),
+        child: NoteCards(ref.watch(notesInFolderProvider(folder))),
       ),
     );
   }

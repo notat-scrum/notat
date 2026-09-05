@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:notat/providers/auth_provider.dart';
 import 'package:notat/providers/folders_provider.dart';
-import 'package:notat/resources/firstore_folder_methods.dart';
 import 'package:notat/screens/errorAndLoading/error_screen.dart';
 import 'package:notat/screens/errorAndLoading/loading_screen.dart';
 import 'package:notat/widgets/foldersRelated/folder_dialog.dart';
@@ -9,14 +9,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
 
-class FoldersTab extends StatefulWidget {
+class FoldersTab extends ConsumerStatefulWidget {
   const FoldersTab({super.key});
 
   @override
-  State<FoldersTab> createState() => _FoldersTabState();
+  ConsumerState<FoldersTab> createState() => _FoldersTabState();
 }
 
-class _FoldersTabState extends State<FoldersTab> {
+class _FoldersTabState extends ConsumerState<FoldersTab> {
   final TextEditingController folderController = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
@@ -35,12 +35,7 @@ class _FoldersTabState extends State<FoldersTab> {
           builder: ((context, ref, child) {
             final streamProv = ref.watch(folderProvider);
             return streamProv.when(
-              data: ((snapshot) {
-                final data = snapshot.data();
-                if (data == null) {
-                  return const ErrorPage();
-                }
-                final keys = data.keys.toList();
+              data: ((keys) {
                 return GridView.builder(
                   physics: BouncingScrollPhysics(),
                   itemCount: keys.length + 1,
@@ -111,9 +106,9 @@ class _FoldersTabState extends State<FoldersTab> {
                                 ),
                                 title: const Text('Delete (All notes inside)'),
                                 onPressed: () async {
-                                  await FirestoreFolderService().deleteFolder(
-                                    keys[index],
-                                  );
+                                  await ref
+                                      .read(firestoreFolderServiceProvider)
+                                      .deleteFolder(keys[index]);
                                 },
                                 backgroundColor: Colors.redAccent,
                               ),

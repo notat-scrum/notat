@@ -1,19 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:notat/resources/auth_methods.dart';
-import 'package:notat/screens/authentication/introduction_screen.dart';
-import 'package:notat/utils/regex.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:notat/providers/auth_provider.dart';
+import 'package:notat/screens/wrapper.dart';
 import 'package:notat/widgets/reusedComponents/animation_transition.dart';
 import 'package:notat/widgets/reusedComponents/input_text_field.dart';
 import 'package:notat/widgets/reusedComponents/snackbar.dart';
 
-class DeleteAccountDialog extends StatelessWidget {
+class DeleteAccountDialog extends ConsumerStatefulWidget {
+  const DeleteAccountDialog({super.key});
+
+  @override
+  ConsumerState<DeleteAccountDialog> createState() =>
+      _DeleteAccountDialogState();
+}
+
+class _DeleteAccountDialogState extends ConsumerState<DeleteAccountDialog> {
   final TextEditingController _controller = TextEditingController();
   final _key = GlobalKey<FormState>();
-  final auth = AuthService();
-  DeleteAccountDialog({super.key});
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final auth = ref.read(authServiceProvider);
     return AlertDialog(
       title: Text('Delete Account'),
       content: SizedBox(
@@ -29,13 +42,10 @@ class DeleteAccountDialog extends StatelessWidget {
                 hintText: 'Confirm Password',
                 isPassword: true,
                 validator: (val) {
-                  if (val != null &&
-                      val.isNotEmpty &&
-                      passwordRegExp.hasMatch(val)) {
+                  if (val != null && val.isNotEmpty) {
                     return null;
-                  } else {
-                    return 'Invalid password';
                   }
+                  return 'Enter your password';
                 },
                 keyboardType: TextInputType.text,
                 toNextField: false,
@@ -63,7 +73,11 @@ class DeleteAccountDialog extends StatelessWidget {
               } else {
                 await auth.deleteAccount();
                 if (!context.mounted) return;
-                FadeTrans(translateTo: IntroductionScreen());
+                Navigator.of(context).pushAndRemoveUntil(
+                  FadeTrans(translateTo: const Wrapper()),
+                  (rota) => false,
+                );
+                return;
               }
               Navigator.pop(context);
             }

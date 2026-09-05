@@ -13,10 +13,7 @@ class FolderMenu extends ConsumerWidget {
     return ref
         .watch(folderProvider)
         .when(
-          data: ((data) {
-            final snapshot = data.data();
-            final keys = snapshot!.keys.toList();
-
+          data: ((keys) {
             return TextButton(
               onPressed: () {
                 // RelativeRect.fill ancorava o menu no canto superior esquerdo

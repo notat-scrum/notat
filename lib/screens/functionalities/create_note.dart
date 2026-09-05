@@ -1,28 +1,34 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:notat/resources/firestore_methods.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:notat/providers/auth_provider.dart';
 import 'package:notat/widgets/notesRelated/custom_app_bar.dart';
 import 'package:notat/widgets/notesRelated/note_header.dart';
 import 'package:notat/widgets/reusedComponents/snackbar.dart';
 import 'package:flutter_quill/flutter_quill.dart' as editor;
 
-class CreateNote extends StatefulWidget {
+class CreateNote extends ConsumerStatefulWidget {
   const CreateNote({super.key});
 
   @override
-  State<CreateNote> createState() => _CreateNoteState();
+  ConsumerState<CreateNote> createState() => _CreateNoteState();
 }
 
-class _CreateNoteState extends State<CreateNote> {
+class _CreateNoteState extends ConsumerState<CreateNote> {
   final editor.QuillController _controller = editor.QuillController.basic();
   final TextEditingController _titleController = TextEditingController();
-  ValueNotifier<String> selected = ValueNotifier('All');
+  final FocusNode _focusNode = FocusNode();
+  final ScrollController _scrollController = ScrollController();
+  final ValueNotifier<String> selected = ValueNotifier('All');
 
   @override
   void dispose() {
     _controller.dispose();
     _titleController.dispose();
+    _focusNode.dispose();
+    _scrollController.dispose();
+    selected.dispose();
     super.dispose();
   }
 
@@ -41,16 +47,16 @@ class _CreateNoteState extends State<CreateNote> {
                       String json = jsonEncode(
                         _controller.document.toDelta().toJson(),
                       );
-                      String plainText = jsonEncode(
-                        _controller.document.toPlainText(),
-                      );
-                      final erro = await FirestoreService().addDocument(
-                        document: json,
-                        searchableDocument: plainText,
-                        title: _titleController.text,
-                        folder: selected.value,
-                        date: DateTime.now(),
-                      );
+                      String plainText = _controller.document.toPlainText();
+                      final erro = await ref
+                          .read(firestoreServiceProvider)
+                          .addDocument(
+                            document: json,
+                            searchableDocument: plainText,
+                            title: _titleController.text,
+                            folder: selected.value,
+                            date: DateTime.now(),
+                          );
                       if (!context.mounted) return;
                       if (erro != null) {
                         CustomSnackBar.show(
@@ -66,12 +72,12 @@ class _CreateNoteState extends State<CreateNote> {
                     editNoteMod: false,
                     titleController: _titleController,
                     selected: selected,
-                    snapshot: null,
+                    note: null,
                   ),
                   Expanded(
                     child: editor.QuillEditor(
-                      focusNode: FocusNode(),
-                      scrollController: ScrollController(),
+                      focusNode: _focusNode,
+                      scrollController: _scrollController,
                       controller: _controller,
                       config: editor.QuillEditorConfig(
                         scrollable: true,

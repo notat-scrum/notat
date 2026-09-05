@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:notat/resources/auth_methods.dart';
-import 'package:notat/resources/firestore_methods.dart';
-import 'package:notat/screens/authentication/introduction_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:notat/providers/auth_provider.dart';
+import 'package:notat/screens/wrapper.dart';
 import 'package:notat/screens/functionalities/create_note.dart';
 import 'package:notat/widgets/delete_account_dialog.dart';
 import 'package:notat/widgets/reusedComponents/animation_transition.dart';
@@ -10,14 +10,14 @@ import 'package:notat/widgets/notesRelated/notes_tab.dart';
 import 'package:notat/widgets/reusedComponents/snackbar.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage>
+class _HomePageState extends ConsumerState<HomePage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
@@ -25,6 +25,12 @@ class _HomePageState extends State<HomePage>
   void initState() {
     _tabController = TabController(length: 2, vsync: this, initialIndex: 0);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
@@ -64,15 +70,18 @@ class _HomePageState extends State<HomePage>
                   itemBuilder: ((context) => [
                     PopupMenuItem(
                       onTap: () async {
-                        await FirestoreService().clearAllNotes();
+                        await ref
+                            .read(firestoreServiceProvider)
+                            .clearAllNotes();
                       },
                       value: 1,
                       child: const Text('Clear All notes'),
                     ),
                     PopupMenuItem(
                       onTap: () async {
-                        await AuthService().reloadUser();
-                        final erro = await AuthService().signOut();
+                        final auth = ref.read(authServiceProvider);
+                        await auth.reloadUser();
+                        final erro = await auth.signOut();
                         if (!context.mounted) return;
                         if (erro != null) {
                           CustomSnackBar.show(
@@ -81,7 +90,10 @@ class _HomePageState extends State<HomePage>
                             Duration(seconds: 2),
                           );
                         }
-                        FadeTrans(translateTo: IntroductionScreen());
+                        Navigator.of(context).pushAndRemoveUntil(
+                          FadeTrans(translateTo: const Wrapper()),
+                          (rota) => false,
+                        );
                       },
                       value: 2,
                       child: const Text('Sign out'),
@@ -93,7 +105,7 @@ class _HomePageState extends State<HomePage>
                           (() => showDialog(
                             context: context,
                             builder: (dialogContext) {
-                              return DeleteAccountDialog();
+                              return const DeleteAccountDialog();
                             },
                           )),
                         );
