@@ -52,3 +52,6 @@ app.*.map.json
 
 # FVM
 .fvm/
+
+# Dump local dos emuladores do Firebase
+.emulator-data/
