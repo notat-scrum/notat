@@ -55,3 +55,6 @@ app.*.map.json
 
 # Dump local dos emuladores do Firebase
 .emulator-data/
+
+# Relatorio de cobertura gerado por flutter test --coverage
+coverage/

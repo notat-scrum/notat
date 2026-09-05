@@ -5,6 +5,10 @@ on:
   push:
     branches: [master]
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   verificacao:
     name: Formatação, análise e testes
@@ -44,4 +48,45 @@ jobs:
         run: dart analyze --fatal-infos
 
       - name: Testes
-        run: flutter test
+        run: flutter test --coverage
+
+      - name: Cobertura
+        id: cobertura
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          encontradas = alcancadas = 0
+          for linha in open('coverage/lcov.info'):
+              if linha.startswith('LF:'):
+                  encontradas += int(linha[3:])
+              elif linha.startswith('LH:'):
+                  alcancadas += int(linha[3:])
+          print(f'percentual={100 * alcancadas / encontradas:.1f}')
+          print(f'alcancadas={alcancadas}')
+          print(f'encontradas={encontradas}')
+          PY
+
+      # o --coverage so reporta arquivo que algum teste importa, entao telas e
+      # widgets sem teste nem entram no denominador
+      - name: Comenta a cobertura no PR
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NUMERO: ${{ github.event.pull_request.number }}
+          PERCENTUAL: ${{ steps.cobertura.outputs.percentual }}
+          ALCANCADAS: ${{ steps.cobertura.outputs.alcancadas }}
+          ENCONTRADAS: ${{ steps.cobertura.outputs.encontradas }}
+        run: |
+          MARCA='<!-- cobertura -->'
+          CORPO="$MARCA
+          **Cobertura de testes: ${PERCENTUAL}%** (${ALCANCADAS}/${ENCONTRADAS} linhas)
+
+          Conta apenas os arquivos que algum teste importa. Telas e widgets sem teste ficam fora do denominador, então o número é o da camada coberta, e não o de \`lib/\` inteiro."
+
+          ANTERIOR=$(gh api "repos/$GITHUB_REPOSITORY/issues/$NUMERO/comments" \
+            --jq "map(select(.body | startswith(\"$MARCA\"))) | .[0].id // empty")
+
+          if [ -n "$ANTERIOR" ]; then
+            gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$ANTERIOR" -f body="$CORPO"
+          else
+            gh api -X POST "repos/$GITHUB_REPOSITORY/issues/$NUMERO/comments" -f body="$CORPO"
+          fi
