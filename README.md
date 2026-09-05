@@ -1,134 +1,171 @@
-
-# Getting Started
-This project is a starting point for a Flutter application.
-A few resources to get you started if this is your first Flutter project:
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, and guidance on mobile development
 # Notat
- Notat is a simple note-taking app with a markdown editor and clean interface, it features: 
-* creating, editing, and deleting notes
-* markdown editor that allows making highly customizable notes
-* organizing notes in folders and more
-## Screenshots
-<a href="https://ibb.co/3v31xpN"><img src="https://i.ibb.co/xYkhn1j/1-20221019-151648-0000.png" alt="1-20221019-151648-0000" border="0"></a>
-<a href="https://ibb.co/TKgqFSC"><img src="https://i.ibb.co/q0rFPfZ/5-20221019-151648-0004.png" alt="5-20221019-151648-0004" border="0"></a>
-<a href="https://ibb.co/gVPS1Lx"><img src="https://i.ibb.co/fvnkRzs/2-20221019-151648-0001.png" alt="2-20221019-151648-0001" border="0"></a>
-<a href="https://ibb.co/Tkx1jsn"><img src="https://i.ibb.co/nbNBdFV/4-20221019-151648-0003.png" alt="4-20221019-151648-0003" border="0"></a>
-<a href="https://ibb.co/ZT8cxWs"><img src="https://i.ibb.co/GP2CRcw/3-20221019-151648-0002.png" alt="3-20221019-151648-0002" border="0"></a>
-## Planned features 🌱
-* data encryption
-* locking notes
-* creating and editing notes offline[1]
-##### [1] due to a bug caused by firebase firestore, users are only able to create and edit notes online, [for more info](https://community.flutterflow.io/c/discuss-and-get-help/navigate-action-not-working-if-device-offline)
 
-## Used Packages List:
-<details>
-<summary>Expand</summary>
+Aplicativo de notas em Flutter, com editor rich text e organização em pastas. Roda em Android.
 
+Este repositório é um fork de [Dev-Salem/notat](https://github.com/Dev-Salem/notat), sob licença MIT.
+O código original é de [@Dev-Salem](https://github.com/Dev-Salem); o texto da licença e o aviso de
+copyright estão em [License.txt](License.txt).
 
-firebase_messaging: ^12.0.1 
+## O que o app faz
 
-uuid: ^3.0.6 
+Criar, editar e excluir notas com formatação, organizar notas em pastas, buscar por título e
+conteúdo. Contas por e-mail e senha, com verificação de e-mail. Os dados ficam no Firestore, um
+documento por nota, sob o usuário dono.
 
-flutter_staggered_grid_view: ^0.6.2 
+## Requisitos
 
-auto_size_text: ^3.0.0 
+| Ferramenta | Versão | Para quê |
+|---|---|---|
+| Git | qualquer | clonar |
+| fvm | 4.x | instalar e fixar o Flutter |
+| Flutter | 3.47.2 | fixado no `.fvmrc`, o fvm baixa sozinho |
+| Android Studio | atual | SDK, emulador e drivers |
+| Android SDK | API 24 ou maior | `minSdk` do app é 24 |
+| JDK | 17 | build do Gradle |
+| JDK | 21 | só para os emuladores do Firebase |
+| Node | 18 ou maior | só para os emuladores do Firebase |
 
-tab_indicator_styler: ^2.0.0 
+Não é preciso criar projeto no Firebase. O `google-services.json` e o `firebase_options.dart` estão
+versionados e apontam para o projeto `notatmelhoria`. Eles não são segredo: são identificadores
+públicos, e quem controla o acesso são as Security Rules em `firestore.rules`.
 
-flutter_quill: ^5.4.1 
+## Instalação
 
-loading_animation_widget: ^1.2.0+2 
+### 1. Git
 
-google_fonts: ^3.0.1 
+Linux: `sudo apt install git`. macOS: `xcode-select --install`. Windows:
+[git-scm.com](https://git-scm.com/download/win).
 
-animated_text_kit: ^4.2.2
+### 2. fvm
 
-lottie: ^1.4.1
+Linux e macOS:
 
-custom_timer: ^0.1.2
-
-jiffy: ^5.0.0
-
-focused_menu: ^1.0.5 
-
-flutter_riverpod: ^1.0.4 
-
-connectivity_plus: ^2.3.9 
-
-flutter_launcher_icons: ^0.9.2 
-
-flutter_native_splash: ^2.0.1+1 
-
-firebase_storage: ^10.3.4 
-
-cloud_firestore: ^3.4.2
-
-firebase_auth: ^3.6.1 
-
-firebase_core: ^1.20.0 
-
-</details>
-
-## Usage
-* clone the project
 ```
-https://github.com/Dev-Salem/notat.git
+curl -fsSL https://fvm.app/install.sh | bash
 ```
-* Create a new Firebase project from the [console](https://console.firebase.google.com/).
-* Configure the Firebase for each platform.
-## Desenvolvimento
 
-O projeto usa uma versao fixa do Flutter, declarada em `.fvmrc`. Rode sempre por `fvm`:
+Windows, no PowerShell:
+
+```
+choco install fvm
+```
+
+Confira com `fvm --version`.
+
+### 3. Flutter
+
+Dentro do repositório clonado, o fvm lê o `.fvmrc` e baixa a versão certa:
+
+```
+git clone https://github.com/notat-scrum/notat.git
+cd notat
+fvm install
+fvm flutter --version
+```
+
+A saída tem que dizer `3.47.2`. Daqui em diante, todo comando do Flutter vai por `fvm flutter`, nunca
+por `flutter` direto, senão você usa a versão da sua máquina em vez da do projeto.
+
+### 4. Android Studio, SDK e JDK
+
+Instale o [Android Studio](https://developer.android.com/studio). No SDK Manager, marque o
+**Android SDK Platform 36**, o **Android SDK Command-line Tools** e o **Android SDK Platform-Tools**.
+
+O Gradle precisa do JDK 17. O Android Studio já traz um, e o Flutter o encontra sozinho na maioria dos
+casos. Se não encontrar, instale o Temurin 17 e aponte:
+
+```
+fvm flutter config --jdk-dir /caminho/para/jdk-17
+```
+
+Aceite as licenças do SDK:
+
+```
+fvm flutter doctor --android-licenses
+```
+
+E confira o resto:
+
+```
+fvm flutter doctor
+```
+
+### 5. Rodar
+
+Com um emulador aberto ou um aparelho conectado por USB com depuração ligada:
 
 ```
 fvm flutter pub get
-fvm flutter analyze --fatal-infos
-fvm flutter test
+fvm flutter run
 ```
 
-### Firebase local
+Para criar um emulador pelo terminal, liste os que existem com `fvm flutter emulators` e suba com
+`fvm flutter emulators --launch <id>`.
 
-Por padrao o app fala com o projeto `notatmelhoria` na nuvem. Para desenvolver contra
-emuladores locais, sem sujar os dados reais:
+## Desenvolvimento
+
+```
+fvm flutter analyze --fatal-infos
+fvm dart analyze
+fvm flutter test
+fvm dart format .
+```
+
+Os dois `analyze` não são redundantes. O `riverpod_lint` entra pelo `analysis_server_plugin`, que o
+`flutter analyze` não carrega e o `dart analyze` carrega. O CI roda os dois.
+
+Cobertura:
+
+```
+fvm flutter test --coverage
+```
+
+O CI publica o percentual como comentário no PR. Ele conta apenas os arquivos que algum teste
+importa, então telas e widgets sem teste nem entram no denominador.
+
+## Firebase local
+
+Por padrão o app fala com o projeto `notatmelhoria` na nuvem. Para desenvolver contra emuladores
+locais, sem tocar nos dados reais:
 
 ```
 JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 firebase emulators:start
 fvm flutter run --dart-define=USE_FIREBASE_EMULATOR=true
 ```
 
-Os emuladores exigem JDK 21 ou superior (`sudo apt install openjdk-21-jdk-headless`). O
-`JAVA_HOME` do projeto aponta para o 17, que e o que o Gradle usa, por isso a variavel vai
-na frente do comando em vez de trocar o padrao da maquina.
+O painel fica em `http://localhost:4000`. O Auth emulado não envia e-mail de verdade: o link de
+verificação aparece no log do `firebase emulators:start` e na aba Logs do painel.
 
-O painel dos emuladores fica em `http://localhost:4000`. O Auth emulado nao envia e-mail de
-verdade: o link de verificacao aparece no log do `firebase emulators:start`.
+Os emuladores exigem JDK 21, enquanto o Gradle usa o 17. Por isso a variável vai na frente do comando,
+em vez de trocar o padrão da máquina. No Linux, `sudo apt install openjdk-21-jdk-headless`.
 
-Em aparelho fisico, `10.0.2.2` nao resolve. Passe o IP da maquina na rede local e acrescente
-esse mesmo IP em `android/app/src/debug/res/xml/network_security_config.xml`, senao o Android
-bloqueia a conexao por ser texto claro:
+Em aparelho físico o endereço `10.0.2.2` não resolve. Passe o IP da máquina na rede e acrescente esse
+mesmo IP em `android/app/src/debug/res/xml/network_security_config.xml`, senão o Android bloqueia a
+conexão por ser texto claro:
 
 ```
 fvm flutter run --dart-define=USE_FIREBASE_EMULATOR=true --dart-define=FIREBASE_EMULATOR_HOST=192.168.0.10
 ```
 
-### Regras de seguranca
+Essa liberação existe só no source set de debug. O build de release continua exigindo HTTPS.
 
-`firestore.rules` e `firestore.indexes.json` sao a fonte de verdade. Depois de mudar,
-publique com:
+## Regras de segurança
+
+`firestore.rules` e `firestore.indexes.json` são a fonte de verdade. Depois de mudar, publique:
 
 ```
 firebase deploy --only firestore:rules,firestore:indexes
 ```
 
-## Installation
-Notat isn't available on the app store yet, but you can try it by installing the apk from [here](https://www.mediafire.com/file/wuhhrx7jiali3pc/notat+v2.apk/file)
-## Contributing
-You can contribute by reporting bugs, suggesting improvements, and/or by helping out in code.
-## License
-[MIT](https://choosealicense.com/licenses/mit/)
-## Acknowledgement
-Special thanks for these designers for inspiring me [1](https://dribbble.com/shots/11875872-A-simple-and-lightweight-note-app), [2](https://dribbble.com/shots/14995291--Notes-App-Dark-Mode)
+## Build de release
+
+Sem o `android/key.properties`, o APK de release sai sem assinatura. É proposital: antes, o build
+assinava com a chave de debug e gerava um APK que parecia publicável.
+
+## Contribuindo
+
+O fluxo de branch, commit, PR e quadro está em [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Licença
+
+MIT. Ver [License.txt](License.txt).
