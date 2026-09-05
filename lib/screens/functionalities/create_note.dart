@@ -47,9 +47,7 @@ class _CreateNoteState extends ConsumerState<CreateNote> {
                       String json = jsonEncode(
                         _controller.document.toDelta().toJson(),
                       );
-                      String plainText = jsonEncode(
-                        _controller.document.toPlainText(),
-                      );
+                      String plainText = _controller.document.toPlainText();
                       final erro = await ref
                           .read(firestoreServiceProvider)
                           .addDocument(

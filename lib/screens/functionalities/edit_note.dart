@@ -78,9 +78,8 @@ class EditNoteState extends ConsumerState<EditNote> {
                               String json = jsonEncode(
                                 controller.document.toDelta().toJson(),
                               );
-                              String plainText = jsonEncode(
-                                controller.document.toPlainText(),
-                              );
+                              String plainText = controller.document
+                                  .toPlainText();
                               final erro = await ref
                                   .read(firestoreServiceProvider)
                                   .updateDocument(

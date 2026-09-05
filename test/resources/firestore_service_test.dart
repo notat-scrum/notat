@@ -85,6 +85,46 @@ void main() {
       },
     );
 
+    test(
+      'o searchableDocument guarda o texto puro, sem escape de JSON',
+      () async {
+        await servico.addDocument(
+          document: r'[{"insert":"Ela disse \"oi\"\nna reuniao\n"}]',
+          title: 'Ata',
+          searchableDocument: 'Ela disse "oi"\nna reuniao\n',
+          date: DateTime(2026, 9, 5),
+        );
+
+        final salva = (await notas(db).get()).docs.single.data();
+        expect(salva['searchableDocument'], 'ela disse "oi" na reuniao');
+      },
+    );
+
+    test(
+      'editar a nota normaliza o searchableDocument do mesmo jeito',
+      () async {
+        await servico.addDocument(
+          document: '[{"insert":"antigo\\n"}]',
+          title: 'Ata',
+          searchableDocument: 'antigo',
+          date: DateTime(2026, 9, 5),
+        );
+        final noteUid = (await notas(db).get()).docs.single.id;
+
+        await servico.updateDocument(
+          document: r'[{"insert":"Ela disse \"oi\"\nna reuniao\n"}]',
+          searchableDocument: 'Ela disse "oi"\nna reuniao\n',
+          title: 'Ata',
+          folder: 'All',
+          noteUid: noteUid,
+          date: DateTime(2026, 9, 6),
+        );
+
+        final salva = (await notas(db).doc(noteUid).get()).data()!;
+        expect(salva['searchableDocument'], 'ela disse "oi" na reuniao');
+      },
+    );
+
     test('excluir a nota tira o documento da colecao', () async {
       await servico.addDocument(
         document: '[{"insert":"conteudo\\n"}]',

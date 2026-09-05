@@ -27,10 +27,10 @@ class FirestoreService {
     final Note note = Note(
       folderId: folder,
       document: document,
-      searchableDocument: searchableDocument.toLowerCase().replaceAll(
-        '\\n',
-        ' ',
-      ),
+      searchableDocument: searchableDocument
+          .toLowerCase()
+          .replaceAll('\n', ' ')
+          .trim(),
       date: date,
       uid: uid,
       title: title.isNotEmpty ? title : 'untitled',
@@ -57,10 +57,10 @@ class FirestoreService {
   }) async {
     final Note note = Note(
       folderId: folder,
-      searchableDocument: searchableDocument.toLowerCase().replaceAll(
-        '\\n',
-        ' ',
-      ),
+      searchableDocument: searchableDocument
+          .toLowerCase()
+          .replaceAll('\n', ' ')
+          .trim(),
       document: document,
       date: date,
       uid: noteUid,
