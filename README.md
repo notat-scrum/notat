@@ -12,18 +12,134 @@ Criar, editar e excluir notas com formatação, organizar notas em pastas, busca
 conteúdo. Contas por e-mail e senha, com verificação de e-mail. Os dados ficam no Firestore, um
 documento por nota, sob o usuário dono.
 
-## Requisitos
+## Entrega N1
 
-| Ferramenta | Versão | Para quê |
-|---|---|---|
-| Git | qualquer | clonar |
-| fvm | 4.x | instalar e fixar o Flutter |
-| Flutter | 3.47.2 | fixado no `.fvmrc`, o fvm baixa sozinho |
-| Android Studio | atual | SDK, emulador e drivers |
-| Android SDK | API 24 ou maior | `minSdk` do app é 24 |
-| JDK | 17 | build do Gradle |
-| JDK | 21 | só para os emuladores do Firebase |
-| Node | 18 ou maior | só para os emuladores do Firebase |
+### A história de usuário da Sprint 1
+
+> Como usuário do aplicativo, quero que minhas notas sejam salvas com segurança mesmo quando eu estiver
+> sem conexão com a internet e que todos os meus dados sejam excluídos definitivamente quando eu apagar
+> minha conta, para que eu não perca o conteúdo que escrevi e tenha a garantia de que nenhuma
+> informação, incluindo notas e pastas, permaneça armazenada após a exclusão da conta.
+
+A equipe tirou quatro requisitos dessa história, estimou cada um em Planning Poker e priorizou por
+MoSCoW. Os quatro ficaram como Must have.
+
+### Como cada requisito foi atendido
+
+| Requisito                                 | Onde está                                                               | Issues que resolvem                                                                                                                                                                                                        | Como conferir                                                                                                    |
+| ----------------------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| RF01: guardar a nota escrita sem internet | `lib/resources/firestore_methods.dart`                                  | [#28](https://github.com/notat-scrum/notat/issues/28), [#27](https://github.com/notat-scrum/notat/issues/27)                                                                                                               | Com o modo avião ligado, escreva uma nota. Ela aparece na lista na hora, em vez de sumir                         |
+| RF02: apagar tudo junto com a conta       | `AuthService.deleteAccount`, que chama `FirestoreService.deleteAllDocs` | [#25](https://github.com/notat-scrum/notat/issues/25), [#27](https://github.com/notat-scrum/notat/issues/27), [#26](https://github.com/notat-scrum/notat/issues/26), [#42](https://github.com/notat-scrum/notat/issues/42) | O teste `deleteAllDocs limpa notas e pastas do usuario`, e o painel do Firestore vazio depois de excluir a conta |
+| RF03: editar notas existentes             | `lib/screens/functionalities/`, `lib/models/note.dart`                  | [#24](https://github.com/notat-scrum/notat/issues/24), [#29](https://github.com/notat-scrum/notat/issues/29), [#33](https://github.com/notat-scrum/notat/issues/33), [#43](https://github.com/notat-scrum/notat/issues/43) | Abra uma nota, edite e volte. O texto e a busca continuam corretos                                               |
+| RF04: sincronizar quando a internet volta | `lib/resources/firestore_methods.dart`                                  | [#28](https://github.com/notat-scrum/notat/issues/28)                                                                                                                                                                      | Desligue o modo avião. A nota escrita offline aparece no painel do Firestore                                     |
+
+O RF01 e o RF04 saem da mesma correção. O app já usava o Firestore, que guarda um cache no aparelho e
+mantém uma fila das escritas pendentes. O problema era o app brigar com isso: antes de gravar, o código
+checava a conexão e recusava a escrita se não houvesse internet, e depois ficava esperando a confirmação
+do servidor, que sem rede nunca chega. A [#28](https://github.com/notat-scrum/notat/issues/28) tirou a
+checagem da camada de dados e parou de aguardar o `set()`. A nota entra no cache local na hora e sobe
+sozinha quando a conexão volta. É a mesma "biblioteca pronta de persistência local" que a equipe citou
+ao estimar o RF01 em 2 pontos.
+
+O RF02 dependeu de mudar a estrutura dos dados. Antes, notas e pastas viviam em coleções globais, com o
+dono guardado num campo. A [#25](https://github.com/notat-scrum/notat/issues/25) moveu tudo para
+`users/{uid}/notes` e `users/{uid}/folders`, e é isso que torna a exclusão completa possível: apagar a
+conta virou varrer duas coleções inteiras, em lote, sem depender de filtro. A
+[#26](https://github.com/notat-scrum/notat/issues/26) versionou as regras que impedem um usuário de ler
+ou escrever fora da própria subárvore.
+
+O RF03 já existia no app herdado, e estava quebrado. As issues listadas não implementam a edição do
+zero. Elas consertam a perda de dados na hora de editar: modelo tipado no lugar de `Map` cru,
+controllers com ciclo de vida correto e o texto de busca gravado sem escape de JSON.
+
+### Marcos, issues e PRs
+
+O trabalho foi organizado em três marcos, com uma issue por tarefa e um commit por issue. Os três PRs
+abaixo estão mergeados na `master`.
+
+#### [Marco 1: o app compila e roda](https://github.com/notat-scrum/notat/milestone/1) · PR [#39](https://github.com/notat-scrum/notat/pull/39)
+
+O projeto herdado não compilava. Este marco destrava o build e deixa um app que qualquer pessoa clona e
+roda no aparelho.
+
+| Issue                                                 | O que mudou                                                     |
+| ----------------------------------------------------- | --------------------------------------------------------------- |
+| [#1](https://github.com/notat-scrum/notat/issues/1)   | Versão do Flutter travada em 3.47.2 pelo `.fvmrc`               |
+| [#2](https://github.com/notat-scrum/notat/issues/2)   | `flutter_lints` declarado e constraint do Dart atualizado       |
+| [#3](https://github.com/notat-scrum/notat/issues/3)   | Plataforma iOS removida: o app é só Android                     |
+| [#4](https://github.com/notat-scrum/notat/issues/4)   | Gradle migrado para o template atual do Flutter                 |
+| [#5](https://github.com/notat-scrum/notat/issues/5)   | `applicationId` vazio corrigido para `br.com.notat.app`         |
+| [#6](https://github.com/notat-scrum/notat/issues/6)   | Build de release parou de assinar com a chave de debug          |
+| [#7](https://github.com/notat-scrum/notat/issues/7)   | Pacote Dart renomeado para `notat`                              |
+| [#8](https://github.com/notat-scrum/notat/issues/8)   | Nome e ícone do app aplicados no Android                        |
+| [#9](https://github.com/notat-scrum/notat/issues/9)   | Configuração do Firebase gerada e versionada                    |
+| [#10](https://github.com/notat-scrum/notat/issues/10) | Firebase atualizado e inicializado por `DefaultFirebaseOptions` |
+| [#11](https://github.com/notat-scrum/notat/issues/11) | Editor migrado do `flutter_quill` 5 para o 11                   |
+| [#12](https://github.com/notat-scrum/notat/issues/12) | Demais dependências atualizadas                                 |
+| [#13](https://github.com/notat-scrum/notat/issues/13) | Dependências sem uso removidas                                  |
+| [#14](https://github.com/notat-scrum/notat/issues/14) | Pacotes abandonados substituídos por código próprio             |
+| [#15](https://github.com/notat-scrum/notat/issues/15) | `exit()` que fechava o app na cara do usuário removido          |
+| [#16](https://github.com/notat-scrum/notat/issues/16) | Teste de template quebrado trocado por testes dos validadores   |
+| [#17](https://github.com/notat-scrum/notat/issues/17) | `flutter analyze` zerado                                        |
+| [#18](https://github.com/notat-scrum/notat/issues/18) | Workflow de CI criado                                           |
+| [#19](https://github.com/notat-scrum/notat/issues/19) | Validação no aparelho e correção das regressões visuais         |
+| [#30](https://github.com/notat-scrum/notat/issues/30) | Uso de `context` depois de `await` protegido por `mounted`      |
+
+#### [Marco 2: arquitetura e dados](https://github.com/notat-scrum/notat/milestone/2) · PR [#41](https://github.com/notat-scrum/notat/pull/41)
+
+É o marco que entrega a história de usuário da Sprint 1. A coluna RF diz qual requisito cada issue
+atende. As três que carregam a história são a #25, a #27 e a #28.
+
+| Issue                                                 | O que mudou                                                              | RF         |
+| ----------------------------------------------------- | ------------------------------------------------------------------------ | ---------- |
+| [#20](https://github.com/notat-scrum/notat/issues/20) | Dados de desenvolvimento do projeto Firebase zerados                     |            |
+| [#21](https://github.com/notat-scrum/notat/issues/21) | Testes da camada de dados, escritos antes da implementação               | RF02       |
+| [#22](https://github.com/notat-scrum/notat/issues/22) | Riverpod migrado da versão 1 para a 3                                    |            |
+| [#23](https://github.com/notat-scrum/notat/issues/23) | Serviços expostos como providers amarrados ao usuário logado             | RF02       |
+| [#24](https://github.com/notat-scrum/notat/issues/24) | Modelo `Note` tipado no lugar de `Map` cru                               | RF03       |
+| [#25](https://github.com/notat-scrum/notat/issues/25) | Coleções remodeladas para `users/{uid}/notes` e `users/{uid}/folders`    | RF02       |
+| [#26](https://github.com/notat-scrum/notat/issues/26) | Regras de segurança e índices do Firestore versionados                   | RF02       |
+| [#27](https://github.com/notat-scrum/notat/issues/27) | Erros engolidos na camada de dados, e exclusão em massa por lote         | RF02       |
+| [#28](https://github.com/notat-scrum/notat/issues/28) | Bloqueio de escrita offline removido                                     | RF01, RF04 |
+| [#29](https://github.com/notat-scrum/notat/issues/29) | Ciclo de vida dos controllers e editores corrigido                       | RF03       |
+| [#31](https://github.com/notat-scrum/notat/issues/31) | Regra de senha forte aplicada só no cadastro, não no login               |            |
+| [#32](https://github.com/notat-scrum/notat/issues/32) | Retorno de erro do cadastro corrigido e mensagens do Firebase traduzidas |            |
+| [#33](https://github.com/notat-scrum/notat/issues/33) | Busca de notas implementada sobre o `searchableDocument`                 | RF03       |
+| [#34](https://github.com/notat-scrum/notat/issues/34) | Peso dos assets reduzido de 2,4 MB para 175 KB                           |            |
+| [#40](https://github.com/notat-scrum/notat/issues/40) | Emuladores locais do Firebase para desenvolvimento                       |            |
+| [#42](https://github.com/notat-scrum/notat/issues/42) | Sair e excluir a conta voltam para a tela inicial                        | RF02       |
+| [#43](https://github.com/notat-scrum/notat/issues/43) | `searchableDocument` gravado sem escape de JSON                          | RF03       |
+
+#### [Marco 3: qualidade e documentação](https://github.com/notat-scrum/notat/milestone/3) · PR [#44](https://github.com/notat-scrum/notat/pull/44)
+
+| Issue                                                 | O que mudou                                         |
+| ----------------------------------------------------- | --------------------------------------------------- |
+| [#35](https://github.com/notat-scrum/notat/issues/35) | Emulador do Firebase configurado                    |
+| [#36](https://github.com/notat-scrum/notat/issues/36) | Cobertura de testes publicada como comentário no PR |
+| [#37](https://github.com/notat-scrum/notat/issues/37) | README de setup reescrito                           |
+| [#38](https://github.com/notat-scrum/notat/issues/38) | CONTRIBUTING com o fluxo do time                    |
+
+### Estado do código na entrega
+
+| Verificação                         | Resultado          |
+| ----------------------------------- | ------------------ |
+| `fvm flutter analyze --fatal-infos` | sem problemas      |
+| `fvm dart analyze`                  | sem problemas      |
+| `fvm flutter test`                  | 25 testes passando |
+| CI no GitHub Actions                | verde nos três PRs |
+
+## Pré-requisitos
+
+| Ferramenta     | Versão          | Para quê                                |
+| -------------- | --------------- | --------------------------------------- |
+| Git            | qualquer        | clonar                                  |
+| fvm            | 4.x             | instalar e fixar o Flutter              |
+| Flutter        | 3.47.2          | fixado no `.fvmrc`, o fvm baixa sozinho |
+| Android Studio | atual           | SDK, emulador e drivers                 |
+| Android SDK    | API 24 ou maior | `minSdk` do app é 24                    |
+| JDK            | 17              | build do Gradle                         |
+| JDK            | 21              | só para os emuladores do Firebase       |
+| Node           | 18 ou maior     | só para os emuladores do Firebase       |
 
 Não é preciso criar projeto no Firebase. O `google-services.json` e o `firebase_options.dart` estão
 versionados e apontam para o projeto `notatmelhoria`. Eles não são segredo: são identificadores
