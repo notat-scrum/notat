@@ -24,6 +24,8 @@ documento por nota, sob o usuário dono.
 A equipe tirou quatro requisitos dessa história, estimou cada um em Planning Poker e priorizou por
 MoSCoW. Os quatro ficaram como Must have.
 
+Vídeo da demonstração: [assistir no OneDrive](https://catolicasc-my.sharepoint.com/:v:/g/personal/vinicius06_oliveira_catolicasc_edu_br/IQAs5xSztcn4TI-M4zIAMGObASfUQz1bU6-eL_vESUGDvGI?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=cyJe5I)
+
 ### Como cada requisito foi atendido
 
 | Requisito                                 | Onde está                                                               | Issues que resolvem                                                                                                                                                                                                        | Como conferir                                                                                                    |
