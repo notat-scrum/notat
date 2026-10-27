@@ -130,6 +130,155 @@ atende. As três que carregam a história são a #25, a #27 e a #28.
 | `fvm flutter test`                  | 25 testes passando |
 | CI no GitHub Actions                | verde nos três PRs |
 
+## Entrega N2
+
+Vídeo da demonstração: _a preencher._
+
+### Sprint Goal
+
+Excluir uma pasta e escrever uma nota sem internet não deixam mais nota fantasma, duplicada ou perdida
+sem aviso, e cada um desses comportamentos fica provado por teste automatizado e revisado em PR.
+
+### Histórias de usuário da Sprint 2
+
+A fala da cliente para a Sprint 2:
+
+> Reparei que às vezes uma pasta que eu esvaziei ainda aparece com notas por um tempo, antes de sumir
+> de vez.
+
+A US01 vem dessa fala. A US02 é a pendência da N1: a sincronização das notas escritas sem internet.
+
+#### US01: esvaziar uma pasta sem notas fantasma
+
+> Como usuário que organiza as notas em pastas, quero que, ao esvaziar uma pasta, as notas dela sumam
+> na hora e de vez, para confiar que o que eu apaguei foi apagado.
+
+Critérios de aceite:
+
+1. **Dado** uma pasta com três notas, **quando** excluo a pasta com as notas de dentro, **então** a
+   pasta e as três notas somem das abas All e Folders de uma vez, sem sumir uma a uma e sem reaparecer
+   depois.
+2. **Dado** notas em outras pastas, **quando** excluo uma pasta, **então** as notas das outras pastas
+   continuam lá.
+3. **Dado** que estou sem internet, **quando** excluo uma pasta, **então** a pasta e as notas dela somem
+   na hora e não voltam quando a conexão volta.
+4. **Dado** que a exclusão falha, **quando** tento excluir a pasta, **então** vejo uma mensagem de erro,
+   em vez de a tela continuar como se nada tivesse acontecido.
+5. **Dado** notas em várias pastas, **quando** uso o Clear All notes, **então** todas as notas somem de
+   uma vez e as pastas continuam.
+
+#### US02: nota escrita sem internet chega ao servidor uma única vez
+
+> Como usuário que escreve notas sem internet, quero que cada nota seja enviada ao servidor uma única vez
+> quando a conexão voltar, para não ficar com cópias duplicadas nem perder o que escrevi.
+
+Critérios de aceite:
+
+1. **Dado** que estou sem internet, **quando** salvo uma nota nova, **então** ela aparece na lista na
+   hora.
+2. **Dado** uma nota criada sem internet, **quando** a conexão volta, **então** existe exatamente um
+   documento dela no Firestore, com o conteúdo que escrevi.
+3. **Dado** uma nota editada duas vezes sem internet, **quando** a conexão volta, **então** o servidor
+   guarda só a última versão, num documento só.
+4. **Dado** que o servidor recusa a gravação, **quando** salvo a nota, **então** sou avisado, em vez de a
+   nota sumir sem explicação.
+
+#### Verificação INVEST
+
+| Critério    | US01                                                | US02                                                |
+| ----------- | --------------------------------------------------- | --------------------------------------------------- |
+| Independent | não depende da US02                                 | não depende da US01                                 |
+| Negotiable  | a história diz o resultado, não como apagar         | a história diz o resultado, não como sincronizar    |
+| Valuable    | o usuário confia na exclusão                        | o usuário não perde nem duplica o que escreveu      |
+| Estimable   | a exclusão de pasta fica em dois arquivos de dados  | a escrita da nota fica num arquivo só               |
+| Small       | cabe numa sprint                                    | cabe numa sprint                                    |
+| Testable    | cada critério vira um teste ou um passo no aparelho | cada critério vira um teste ou um passo no aparelho |
+
+### Trabalho adiantado na N1
+
+Parte do que a cliente pediu já tinha sido resolvido na Sprint 1. Esses itens entram no backlog como
+prontos, cada um com o teste que comprova o comportamento.
+
+O sintoma da US01 vinha do código herdado. Ao excluir uma pasta, o app disparava a exclusão das notas
+sem esperar por ela e apagava uma nota de cada vez. O método avisava que tinha terminado antes de apagar
+qualquer coisa, e a lista ia esvaziando aos poucos. A [#27](https://github.com/notat-scrum/notat/issues/27)
+passou a apagar tudo num lote só e a esperar o lote terminar, e a
+[#25](https://github.com/notat-scrum/notat/issues/25) deixou a pasta só no campo `folderId` da nota.
+
+A gravação sem internet da US02 entrou na [#28](https://github.com/notat-scrum/notat/issues/28), mas
+nenhum teste prova que ela funciona. Por isso a US02 continua no backlog da Sprint 2, na #48.
+
+| Item pronto                                           | Resolvido em                                                                                                 | Teste que comprova                                                            |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| US01, critérios 1 e 2: a pasta sai com as notas dela  | [#25](https://github.com/notat-scrum/notat/issues/25), [#27](https://github.com/notat-scrum/notat/issues/27) | `excluir a pasta leva junto as notas de dentro`                               |
+| US01, critério 5: Clear All notes preserva as pastas  | [#27](https://github.com/notat-scrum/notat/issues/27)                                                        | `limpar as notas preserva as pastas`                                          |
+| Pipeline de CI com `flutter analyze` e `flutter test` | [#18](https://github.com/notat-scrum/notat/issues/18), [#36](https://github.com/notat-scrum/notat/issues/36) | o próprio [CI](https://github.com/notat-scrum/notat/actions/workflows/ci.yml) |
+
+### Backlog da Sprint 2
+
+O que faltava das histórias, mais os code smells encontrados na investigação. Estimativas em pontos de
+Planning Poker, na sequência de Fibonacci. As issues estão no
+[Marco 4: Sprint 2](https://github.com/notat-scrum/notat/milestone/4) e foram sorteadas em pares. Cada
+par toca os mesmos arquivos, para que dois PRs abertos ao mesmo tempo não entrem em conflito.
+
+| Issue                                                 | Item                                                      | Origem           | Pontos | MoSCoW | Justificativa                                                                                                                             | Responsável                |
+| ----------------------------------------------------- | --------------------------------------------------------- | ---------------- | ------ | ------ | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| [#46](https://github.com/notat-scrum/notat/issues/46) | Desfazer a dependência circular entre os serviços         | code smell       | 3      | Must   | Smell do catálogo, e pré-requisito da #47                                                                                                 | Eduardo Hoeft              |
+| [#47](https://github.com/notat-scrum/notat/issues/47) | Excluir a pasta e as notas de uma vez, mesmo sem internet | US01, critério 3 | 5      | Must   | Sem internet a pasta vazia continua na tela, que é o sintoma relatado                                                                     | Eduardo Hoeft              |
+| [#48](https://github.com/notat-scrum/notat/issues/48) | Provar a sincronização offline e avisar a falha           | US02             | 5      | Must   | A professora pediu prova de que a nota sobe uma vez só. Hoje a falha passa em silêncio, e reabrir uma nota editada traz a versão anterior | Vinícius Leitempergher     |
+| [#49](https://github.com/notat-scrum/notat/issues/49) | Extrair a montagem da nota repetida                       | code smell       | 2      | Should | Quarto smell do catálogo. O mínimo de três já está coberto pela #46, #48 e #50                                                            | Vinícius Leitempergher     |
+| [#50](https://github.com/notat-scrum/notat/issues/50) | Centralizar o caminho das coleções do usuário             | code smell       | 3      | Must   | Smell do catálogo, e põe sob teste os três providers que hoje não têm nenhum                                                              | Vinicius Pedroso Schoeffel |
+| [#51](https://github.com/notat-scrum/notat/issues/51) | Mostrar o erro da exclusão                                | US01, critério 4 | 3      | Must   | Critério de aceite da US01, e o primeiro teste de widget do projeto                                                                       | Vinicius Pedroso Schoeffel |
+| [#52](https://github.com/notat-scrum/notat/issues/52) | Preencher a seção da entrega N2 no README                 | entrega          | 2      | Must   | O README é o documento avaliado                                                                                                           | Vinícius Bueno de Oliveira |
+
+A Sprint 2 compromete 23 pontos.
+
+### Papéis na Sprint 2
+
+| Papel             | Integrante                                                        |
+| ----------------- | ----------------------------------------------------------------- |
+| Product Owner     | Vinícius Bonatti Benner                                           |
+| Scrum Master      | Vinícius Bueno de Oliveira                                        |
+| Revisão de código | Vinícius Bueno de Oliveira                                        |
+| Dev               | Eduardo Hoeft, Vinícius Leitempergher, Vinicius Pedroso Schoeffel |
+
+### Definition of Done
+
+Uma issue só está pronta quando:
+
+- o comportamento que ela muda tem teste automatizado escrito antes da mudança: numa correção, o teste
+  falha antes e passa depois; numa refatoração, o teste de regressão passa antes e depois, sem
+  alteração;
+- o que os arquivos tocados fazem e ainda não tinha teste ganhou teste no mesmo PR;
+- os critérios de aceite da história que ela atende foram conferidos, e o que depende do aparelho tem
+  print no PR;
+- não introduz code smell conhecido, e o smell corrigido entrou no catálogo abaixo;
+- `fvm dart format .`, `fvm flutter analyze --fatal-infos`, `fvm dart analyze` e `fvm flutter test`
+  passam, e o CI está verde;
+- o PR foi revisado e aprovado por um colega, com os comentários da revisão no próprio PR;
+- está mergeada na `master`, a issue fechou e o card está em Pronto no quadro.
+
+Uma história está pronta quando todas as issues dela estão.
+
+### Catálogo de code smells
+
+| Issue                                                 | Smell                                                                | Onde está                                                                                                        | Refatoração aplicada | Teste de regressão | Tipo            |
+| ----------------------------------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | -------------------- | ------------------ | --------------- |
+| [#46](https://github.com/notat-scrum/notat/issues/46) | Dependência circular entre os serviços                               | `lib/resources/firestore_methods.dart`, construtor; `lib/resources/firstore_folder_methods.dart`, `deleteFolder` | _a preencher_        | _a preencher_      | refatoração     |
+| [#48](https://github.com/notat-scrum/notat/issues/48) | `try/catch` que nunca captura, em volta de um `Future` não aguardado | `lib/resources/firestore_methods.dart`, `addDocument` e `updateDocument`                                         | _a preencher_        | _a preencher_      | correção de bug |
+| [#49](https://github.com/notat-scrum/notat/issues/49) | Código duplicado na montagem da nota                                 | `lib/resources/firestore_methods.dart`, `addDocument` e `updateDocument`                                         | _a preencher_        | _a preencher_      | refatoração     |
+| [#50](https://github.com/notat-scrum/notat/issues/50) | Caminho das coleções repetido em cinco lugares                       | `lib/providers/note_provider.dart`, `lib/providers/folders_provider.dart`, `lib/resources/`                      | _a preencher_        | _a preencher_      | refatoração     |
+
+### Pull requests e CI
+
+Pipeline: [CI no GitHub Actions](https://github.com/notat-scrum/notat/actions/workflows/ci.yml), que
+roda formatação, `flutter analyze`, `dart analyze` e `flutter test` a cada push na `master` e a cada PR.
+Os comandos para rodar os testes localmente estão em [Desenvolvimento](#desenvolvimento).
+
+| PR                                                  | O que entrega                                                                  | Revisão                                                                                                                  |
+| --------------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| [#45](https://github.com/notat-scrum/notat/pull/45) | Seção da entrega N2 no README: histórias, backlog, papéis e Definition of Done | Vinícius Bonatti Benner, aprovado. A revisão achou o bug da versão antiga ao reabrir uma nota editada, que entrou na #48 |
+
 ## Pré-requisitos
 
 | Ferramenta     | Versão          | Para quê                                |
