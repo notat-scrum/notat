@@ -141,7 +141,7 @@ sem aviso, e cada um desses comportamentos fica provado por teste automatizado e
 
 ### Histórias de usuário da Sprint 2
 
-A fala da cliente para o Sprint 2:
+A fala da cliente para a Sprint 2:
 
 > Reparei que às vezes uma pasta que eu esvaziei ainda aparece com notas por um tempo, antes de sumir
 > de vez.
@@ -196,64 +196,51 @@ Critérios de aceite:
 
 ### Trabalho adiantado na N1
 
-Parte do que a cliente pediu já tinha sido resolvido na Sprint 1, e entra no backlog como pronto.
+Parte do que a cliente pediu já tinha sido resolvido na Sprint 1. Esses itens entram no backlog como
+prontos, cada um com o teste que comprova o comportamento.
 
 O sintoma da US01 vinha do código herdado. Ao excluir uma pasta, o app disparava a exclusão das notas
 sem esperar por ela e apagava uma nota de cada vez. O método avisava que tinha terminado antes de apagar
 qualquer coisa, e a lista ia esvaziando aos poucos. A [#27](https://github.com/notat-scrum/notat/issues/27)
 passou a apagar tudo num lote só e a esperar o lote terminar, e a
-[#25](https://github.com/notat-scrum/notat/issues/25) deixou a pasta só no campo `folderId` da nota. Os
-critérios 1, 2 e 5 da US01 já são cobertos pelos testes `excluir a pasta leva junto as notas de dentro`
-e `limpar as notas preserva as pastas`. Sem internet, a pasta vazia ainda fica na tela até a conexão
-voltar, e o erro da exclusão não aparece para o usuário: são os critérios 3 e 4, que ficaram para a
-Sprint 2.
+[#25](https://github.com/notat-scrum/notat/issues/25) deixou a pasta só no campo `folderId` da nota.
 
-A gravação sem internet da US02 entrou na [#28](https://github.com/notat-scrum/notat/issues/28). Os
-critérios 1 a 3 funcionam, mas nenhum teste prova isso. O critério 4 é um bug encontrado na
-investigação: quando o servidor recusa a gravação, a nota some sem aviso.
+A gravação sem internet da US02 entrou na [#28](https://github.com/notat-scrum/notat/issues/28), mas
+nenhum teste prova que ela funciona. Por isso a US02 continua no backlog da Sprint 2, na #48.
+
+| Item pronto                                           | Resolvido em                                                                                                 | Teste que comprova                                                            |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| US01, critérios 1 e 2: a pasta sai com as notas dela  | [#25](https://github.com/notat-scrum/notat/issues/25), [#27](https://github.com/notat-scrum/notat/issues/27) | `excluir a pasta leva junto as notas de dentro`                               |
+| US01, critério 5: Clear All notes preserva as pastas  | [#27](https://github.com/notat-scrum/notat/issues/27)                                                        | `limpar as notas preserva as pastas`                                          |
+| Pipeline de CI com `flutter analyze` e `flutter test` | [#18](https://github.com/notat-scrum/notat/issues/18), [#36](https://github.com/notat-scrum/notat/issues/36) | o próprio [CI](https://github.com/notat-scrum/notat/actions/workflows/ci.yml) |
 
 ### Backlog da Sprint 2
 
-Estimativas em pontos de Planning Poker, na sequência de Fibonacci.
+O que faltava das histórias, mais os code smells encontrados na investigação. Estimativas em pontos de
+Planning Poker, na sequência de Fibonacci. As issues estão no
+[Marco 4: Sprint 2](https://github.com/notat-scrum/notat/milestone/4) e foram sorteadas em pares. Cada
+par toca os mesmos arquivos, para que dois PRs abertos ao mesmo tempo não entrem em conflito.
 
-| Item                                                          | Origem            | Issue                                                 | Pontos | MoSCoW | Justificativa                                                                                         | Estado                  |
-| ------------------------------------------------------------- | ----------------- | ----------------------------------------------------- | ------ | ------ | ----------------------------------------------------------------------------------------------------- | ----------------------- |
-| US01, critérios 1, 2 e 5: excluir pasta apaga tudo de uma vez | pedido da cliente | [#27](https://github.com/notat-scrum/notat/issues/27) | 5      | Must   | É a fala da cliente na Sprint 2                                                                       | pronto, adiantado na N1 |
-| Desfazer a dependência circular entre os serviços             | code smell        | [#46](https://github.com/notat-scrum/notat/issues/46) | 3      | Must   | Smell do catálogo, e pré-requisito da #47                                                             |                         |
-| US01, critério 3: excluir pasta sem internet                  | pedido da cliente | [#47](https://github.com/notat-scrum/notat/issues/47) | 5      | Must   | Sem isso a pasta vazia continua na tela, que é o sintoma relatado                                     |                         |
-| US02: provar a sincronização offline e avisar a falha         | pendência da N1   | [#48](https://github.com/notat-scrum/notat/issues/48) | 5      | Must   | A professora pediu prova de que a nota sobe uma vez só, e a falha hoje passa em silêncio              |                         |
-| Extrair a montagem da nota repetida                           | code smell        | [#49](https://github.com/notat-scrum/notat/issues/49) | 2      | Should | Quarto smell do catálogo. O mínimo de três já está coberto pela #46, #48 e #50                        |                         |
-| Centralizar o caminho das coleções do usuário                 | code smell        | [#50](https://github.com/notat-scrum/notat/issues/50) | 3      | Must   | Smell do catálogo, e põe sob teste os três providers que hoje não têm nenhum                          |                         |
-| US01, critério 4: mostrar o erro da exclusão                  | pedido da cliente | [#51](https://github.com/notat-scrum/notat/issues/51) | 3      | Must   | Critério de aceite da US01, e o primeiro teste de widget do projeto                                   |                         |
-| Preencher a seção da entrega N2 no README                     | entrega           | [#52](https://github.com/notat-scrum/notat/issues/52) | 2      | Must   | O README é o documento avaliado                                                                       |                         |
-| Regras do Firestore exigirem e-mail verificado                | validação da N1   | sem issue                                             | 3      | Could  | Hoje só a tela barra quem não verificou o e-mail. Fica para depois porque não foi pedido nesta sprint |                         |
-| Abrir a verificação de e-mail já no cadastro                  | validação da N1   | sem issue                                             | 2      | Won't  | Muda o fluxo de cadastro, e é decisão de produto que não entra nesta sprint                           |                         |
+| Issue                                                 | Item                                                      | Origem           | Pontos | MoSCoW | Justificativa                                                                            | Responsável                |
+| ----------------------------------------------------- | --------------------------------------------------------- | ---------------- | ------ | ------ | ---------------------------------------------------------------------------------------- | -------------------------- |
+| [#46](https://github.com/notat-scrum/notat/issues/46) | Desfazer a dependência circular entre os serviços         | code smell       | 3      | Must   | Smell do catálogo, e pré-requisito da #47                                                | Eduardo Hoeft              |
+| [#47](https://github.com/notat-scrum/notat/issues/47) | Excluir a pasta e as notas de uma vez, mesmo sem internet | US01, critério 3 | 5      | Must   | Sem internet a pasta vazia continua na tela, que é o sintoma relatado                    | Eduardo Hoeft              |
+| [#48](https://github.com/notat-scrum/notat/issues/48) | Provar a sincronização offline e avisar a falha           | US02             | 5      | Must   | A professora pediu prova de que a nota sobe uma vez só, e hoje a falha passa em silêncio | Vinícius Leitempergher     |
+| [#49](https://github.com/notat-scrum/notat/issues/49) | Extrair a montagem da nota repetida                       | code smell       | 2      | Should | Quarto smell do catálogo. O mínimo de três já está coberto pela #46, #48 e #50           | Vinícius Leitempergher     |
+| [#50](https://github.com/notat-scrum/notat/issues/50) | Centralizar o caminho das coleções do usuário             | code smell       | 3      | Must   | Smell do catálogo, e põe sob teste os três providers que hoje não têm nenhum             | Vinicius Pedroso Schoeffel |
+| [#51](https://github.com/notat-scrum/notat/issues/51) | Mostrar o erro da exclusão                                | US01, critério 4 | 3      | Must   | Critério de aceite da US01, e o primeiro teste de widget do projeto                      | Vinicius Pedroso Schoeffel |
+| [#52](https://github.com/notat-scrum/notat/issues/52) | Preencher a seção da entrega N2 no README                 | entrega          | 2      | Must   | O README é o documento avaliado                                                          | Vinícius Bueno de Oliveira |
 
-A Sprint 2 compromete 23 pontos, das issues #46 a #52.
+A Sprint 2 compromete 23 pontos.
 
-### Papéis e issues da Sprint 2
+### Papéis na Sprint 2
 
 | Papel             | Integrante                                                        |
 | ----------------- | ----------------------------------------------------------------- |
 | Product Owner     | Vinícius Bonatti Benner                                           |
-| Scrum Master      | _a preencher_                                                     |
+| Scrum Master      | Vinícius Bueno de Oliveira                                        |
 | Revisão de código | Vinícius Bueno de Oliveira                                        |
 | Dev               | Eduardo Hoeft, Vinícius Leitempergher, Vinicius Pedroso Schoeffel |
-
-#### [Marco 4: Sprint 2](https://github.com/notat-scrum/notat/milestone/4)
-
-As issues de código foram sorteadas em pares. Cada par toca os mesmos arquivos, para que dois PRs
-abertos ao mesmo tempo não entrem em conflito.
-
-| Issue                                                 | O que muda                                                          | Responsável                |
-| ----------------------------------------------------- | ------------------------------------------------------------------- | -------------------------- |
-| [#46](https://github.com/notat-scrum/notat/issues/46) | Dependência circular entre os serviços do Firestore desfeita        | Eduardo Hoeft              |
-| [#47](https://github.com/notat-scrum/notat/issues/47) | Pasta e notas excluídas de uma vez, mesmo sem internet              | Eduardo Hoeft              |
-| [#48](https://github.com/notat-scrum/notat/issues/48) | Sincronização offline provada por teste e falha de gravação avisada | Vinícius Leitempergher     |
-| [#49](https://github.com/notat-scrum/notat/issues/49) | Montagem da nota extraída para um lugar só                          | Vinícius Leitempergher     |
-| [#50](https://github.com/notat-scrum/notat/issues/50) | Caminho das coleções do usuário centralizado                        | Vinicius Pedroso Schoeffel |
-| [#51](https://github.com/notat-scrum/notat/issues/51) | Erro da exclusão mostrado ao usuário                                | Vinicius Pedroso Schoeffel |
-| [#52](https://github.com/notat-scrum/notat/issues/52) | Seção da entrega N2 no README preenchida                            | Vinícius Bueno de Oliveira |
 
 ### Definition of Done
 
@@ -275,12 +262,12 @@ Uma história está pronta quando todas as issues dela estão.
 
 ### Catálogo de code smells
 
-| Smell                                                                | Onde está                                                                                                        | Refatoração aplicada | Teste de regressão | Tipo            |
-| -------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | -------------------- | ------------------ | --------------- |
-| Dependência circular entre os serviços                               | `lib/resources/firestore_methods.dart`, construtor; `lib/resources/firstore_folder_methods.dart`, `deleteFolder` | _a preencher_        | _a preencher_      | refatoração     |
-| `try/catch` que nunca captura, em volta de um `Future` não aguardado | `lib/resources/firestore_methods.dart`, `addDocument` e `updateDocument`                                         | _a preencher_        | _a preencher_      | correção de bug |
-| Código duplicado na montagem da nota                                 | `lib/resources/firestore_methods.dart`, `addDocument` e `updateDocument`                                         | _a preencher_        | _a preencher_      | refatoração     |
-| Caminho das coleções repetido em cinco lugares                       | `lib/providers/note_provider.dart`, `lib/providers/folders_provider.dart`, `lib/resources/`                      | _a preencher_        | _a preencher_      | refatoração     |
+| Issue                                                 | Smell                                                                | Onde está                                                                                                        | Refatoração aplicada | Teste de regressão | Tipo            |
+| ----------------------------------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | -------------------- | ------------------ | --------------- |
+| [#46](https://github.com/notat-scrum/notat/issues/46) | Dependência circular entre os serviços                               | `lib/resources/firestore_methods.dart`, construtor; `lib/resources/firstore_folder_methods.dart`, `deleteFolder` | _a preencher_        | _a preencher_      | refatoração     |
+| [#48](https://github.com/notat-scrum/notat/issues/48) | `try/catch` que nunca captura, em volta de um `Future` não aguardado | `lib/resources/firestore_methods.dart`, `addDocument` e `updateDocument`                                         | _a preencher_        | _a preencher_      | correção de bug |
+| [#49](https://github.com/notat-scrum/notat/issues/49) | Código duplicado na montagem da nota                                 | `lib/resources/firestore_methods.dart`, `addDocument` e `updateDocument`                                         | _a preencher_        | _a preencher_      | refatoração     |
+| [#50](https://github.com/notat-scrum/notat/issues/50) | Caminho das coleções repetido em cinco lugares                       | `lib/providers/note_provider.dart`, `lib/providers/folders_provider.dart`, `lib/resources/`                      | _a preencher_        | _a preencher_      | refatoração     |
 
 ### Pull requests e CI
 
@@ -288,9 +275,9 @@ Pipeline: [CI no GitHub Actions](https://github.com/notat-scrum/notat/actions/wo
 roda formatação, `flutter analyze`, `dart analyze` e `flutter test` a cada push na `master` e a cada PR.
 Os comandos para rodar os testes localmente estão em [Desenvolvimento](#desenvolvimento).
 
-| PR  | O que entrega | Revisão |
-| --- | ------------- | ------- |
-|     |               |         |
+| PR                                                  | O que entrega                                                                  | Revisão       |
+| --------------------------------------------------- | ------------------------------------------------------------------------------ | ------------- |
+| [#45](https://github.com/notat-scrum/notat/pull/45) | Seção da entrega N2 no README: histórias, backlog, papéis e Definition of Done | _a preencher_ |
 
 ## Pré-requisitos
 
