@@ -221,15 +221,15 @@ Planning Poker, na sequência de Fibonacci. As issues estão no
 [Marco 4: Sprint 2](https://github.com/notat-scrum/notat/milestone/4) e foram sorteadas em pares. Cada
 par toca os mesmos arquivos, para que dois PRs abertos ao mesmo tempo não entrem em conflito.
 
-| Issue                                                 | Item                                                      | Origem           | Pontos | MoSCoW | Justificativa                                                                            | Responsável                |
-| ----------------------------------------------------- | --------------------------------------------------------- | ---------------- | ------ | ------ | ---------------------------------------------------------------------------------------- | -------------------------- |
-| [#46](https://github.com/notat-scrum/notat/issues/46) | Desfazer a dependência circular entre os serviços         | code smell       | 3      | Must   | Smell do catálogo, e pré-requisito da #47                                                | Eduardo Hoeft              |
-| [#47](https://github.com/notat-scrum/notat/issues/47) | Excluir a pasta e as notas de uma vez, mesmo sem internet | US01, critério 3 | 5      | Must   | Sem internet a pasta vazia continua na tela, que é o sintoma relatado                    | Eduardo Hoeft              |
-| [#48](https://github.com/notat-scrum/notat/issues/48) | Provar a sincronização offline e avisar a falha           | US02             | 5      | Must   | A professora pediu prova de que a nota sobe uma vez só, e hoje a falha passa em silêncio | Vinícius Leitempergher     |
-| [#49](https://github.com/notat-scrum/notat/issues/49) | Extrair a montagem da nota repetida                       | code smell       | 2      | Should | Quarto smell do catálogo. O mínimo de três já está coberto pela #46, #48 e #50           | Vinícius Leitempergher     |
-| [#50](https://github.com/notat-scrum/notat/issues/50) | Centralizar o caminho das coleções do usuário             | code smell       | 3      | Must   | Smell do catálogo, e põe sob teste os três providers que hoje não têm nenhum             | Vinicius Pedroso Schoeffel |
-| [#51](https://github.com/notat-scrum/notat/issues/51) | Mostrar o erro da exclusão                                | US01, critério 4 | 3      | Must   | Critério de aceite da US01, e o primeiro teste de widget do projeto                      | Vinicius Pedroso Schoeffel |
-| [#52](https://github.com/notat-scrum/notat/issues/52) | Preencher a seção da entrega N2 no README                 | entrega          | 2      | Must   | O README é o documento avaliado                                                          | Vinícius Bueno de Oliveira |
+| Issue                                                 | Item                                                      | Origem           | Pontos | MoSCoW | Justificativa                                                                                                                             | Responsável                |
+| ----------------------------------------------------- | --------------------------------------------------------- | ---------------- | ------ | ------ | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| [#46](https://github.com/notat-scrum/notat/issues/46) | Desfazer a dependência circular entre os serviços         | code smell       | 3      | Must   | Smell do catálogo, e pré-requisito da #47                                                                                                 | Eduardo Hoeft              |
+| [#47](https://github.com/notat-scrum/notat/issues/47) | Excluir a pasta e as notas de uma vez, mesmo sem internet | US01, critério 3 | 5      | Must   | Sem internet a pasta vazia continua na tela, que é o sintoma relatado                                                                     | Eduardo Hoeft              |
+| [#48](https://github.com/notat-scrum/notat/issues/48) | Provar a sincronização offline e avisar a falha           | US02             | 5      | Must   | A professora pediu prova de que a nota sobe uma vez só. Hoje a falha passa em silêncio, e reabrir uma nota editada traz a versão anterior | Vinícius Leitempergher     |
+| [#49](https://github.com/notat-scrum/notat/issues/49) | Extrair a montagem da nota repetida                       | code smell       | 2      | Should | Quarto smell do catálogo. O mínimo de três já está coberto pela #46, #48 e #50                                                            | Vinícius Leitempergher     |
+| [#50](https://github.com/notat-scrum/notat/issues/50) | Centralizar o caminho das coleções do usuário             | code smell       | 3      | Must   | Smell do catálogo, e põe sob teste os três providers que hoje não têm nenhum                                                              | Vinicius Pedroso Schoeffel |
+| [#51](https://github.com/notat-scrum/notat/issues/51) | Mostrar o erro da exclusão                                | US01, critério 4 | 3      | Must   | Critério de aceite da US01, e o primeiro teste de widget do projeto                                                                       | Vinicius Pedroso Schoeffel |
+| [#52](https://github.com/notat-scrum/notat/issues/52) | Preencher a seção da entrega N2 no README                 | entrega          | 2      | Must   | O README é o documento avaliado                                                                                                           | Vinícius Bueno de Oliveira |
 
 A Sprint 2 compromete 23 pontos.
 
@@ -275,9 +275,9 @@ Pipeline: [CI no GitHub Actions](https://github.com/notat-scrum/notat/actions/wo
 roda formatação, `flutter analyze`, `dart analyze` e `flutter test` a cada push na `master` e a cada PR.
 Os comandos para rodar os testes localmente estão em [Desenvolvimento](#desenvolvimento).
 
-| PR                                                  | O que entrega                                                                  | Revisão       |
-| --------------------------------------------------- | ------------------------------------------------------------------------------ | ------------- |
-| [#45](https://github.com/notat-scrum/notat/pull/45) | Seção da entrega N2 no README: histórias, backlog, papéis e Definition of Done | _a preencher_ |
+| PR                                                  | O que entrega                                                                  | Revisão                                                                                                                  |
+| --------------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| [#45](https://github.com/notat-scrum/notat/pull/45) | Seção da entrega N2 no README: histórias, backlog, papéis e Definition of Done | Vinícius Bonatti Benner, aprovado. A revisão achou o bug da versão antiga ao reabrir uma nota editada, que entrou na #48 |
 
 ## Pré-requisitos
 
