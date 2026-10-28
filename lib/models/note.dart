@@ -10,6 +10,26 @@ class Note {
     required this.date,
   });
 
+  /// Monta a nota como ela e gravada, a partir do que veio do editor. Criar e
+  /// editar passam por aqui, para nao gravarem a nota de jeitos diferentes.
+  factory Note.fromEditor({
+    required String uid,
+    required String title,
+    required String document,
+    required String plainText,
+    required String folderId,
+    required DateTime date,
+  }) {
+    return Note(
+      uid: uid,
+      title: title.isNotEmpty ? title : 'untitled',
+      document: document,
+      searchableDocument: plainText.toLowerCase().replaceAll('\n', ' ').trim(),
+      folderId: folderId,
+      date: date,
+    );
+  }
+
   factory Note.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     final dados = doc.data() ?? const <String, dynamic>{};
     return Note(
