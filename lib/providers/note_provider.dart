@@ -39,6 +39,8 @@ final notesInFolderProvider = StreamProvider.family<List<Note>, String>((
       .map((consulta) => consulta.docs.map(Note.fromFirestore).toList());
 });
 
-final noteProvider = FutureProvider.family<Note?, String>(
-  (ref, uid) => ref.watch(firestoreServiceProvider).getNote(uid: uid),
+// autoDispose: sem ele a primeira leitura ficava guardada enquanto o app
+// estivesse aberto, e reabrir uma nota editada trazia a versao anterior
+final noteProvider = StreamProvider.autoDispose.family<Note?, String>(
+  (ref, uid) => ref.watch(firestoreServiceProvider).watchNote(uid: uid),
 );

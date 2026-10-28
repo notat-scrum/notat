@@ -6,17 +6,21 @@ import 'package:notat/resources/firstore_folder_methods.dart';
 import 'package:uuid/uuid.dart';
 
 class FirestoreService {
-  FirestoreService(this._firestore, this.userUid)
+  FirestoreService(this._firestore, this.userUid, {this.aoFalharGravacao})
     : firestoreFolder = FirestoreFolderService(_firestore, userUid);
 
   final FirebaseFirestore _firestore;
   final FirestoreFolderService firestoreFolder;
   final String userUid;
 
+  /// Recebe a mensagem quando o servidor recusa a gravacao de uma nota. Sem ele
+  /// a falha nao e engolida: segue como erro nao tratado.
+  final void Function(String mensagem)? aoFalharGravacao;
+
   CollectionReference<Map<String, dynamic>> get _notes =>
       _firestore.collection('users').doc(userUid).collection('notes');
 
-  Future<String?> addDocument({
+  Future<void> addDocument({
     required String document,
     required String title,
     required String searchableDocument,
@@ -36,18 +40,10 @@ class FirestoreService {
       title: title.isNotEmpty ? title : 'untitled',
     );
 
-    try {
-      // o set() so completa quando o servidor confirma; sem internet ele fica
-      // pendente para sempre e a tela travaria. O SDK ja guarda a escrita
-      // localmente e sincroniza sozinho quando a conexao volta.
-      unawaited(_notes.doc(uid).set(note.toFirestore()));
-    } on FirebaseException catch (e) {
-      return e.message!;
-    }
-    return null;
+    _gravaSemEsperar(note);
   }
 
-  Future<String?> updateDocument({
+  Future<void> updateDocument({
     required String document,
     required String searchableDocument,
     required String title,
@@ -67,21 +63,37 @@ class FirestoreService {
       title: title.isNotEmpty ? title : 'untitled',
     );
 
-    try {
-      unawaited(_notes.doc(noteUid).set(note.toFirestore()));
-    } on FirebaseException catch (e) {
-      return e.message!;
-    }
-    return null;
+    _gravaSemEsperar(note);
   }
 
-  Future<Note?> getNote({required String uid}) async {
-    final snapshot = await _notes.doc(uid).get();
-    if (!snapshot.exists) {
-      return null;
+  // o set() so completa quando o servidor confirma; sem internet ele fica
+  // pendente para sempre e a tela travaria. O SDK ja guarda a escrita
+  // localmente e sincroniza sozinho quando a conexao volta. Um try/catch em
+  // volta nao pegaria nada, porque o erro chega depois que o metodo retornou:
+  // a falha tem que ser tratada no proprio Future.
+  void _gravaSemEsperar(Note note) {
+    final gravacao = _notes.doc(note.uid).set(note.toFirestore());
+    final aviso = aoFalharGravacao;
+    if (aviso == null) {
+      unawaited(gravacao);
+      return;
     }
-    return Note.fromFirestore(snapshot);
+    unawaited(
+      gravacao.catchError(
+        (Object erro) => aviso('The note could not be saved: ${_motivo(erro)}'),
+      ),
+    );
   }
+
+  static String _motivo(Object erro) =>
+      erro is FirebaseException ? erro.message ?? erro.code : erro.toString();
+
+  /// Emite primeiro o que esta no cache local, entao abre na hora mesmo sem
+  /// internet, e de novo a cada gravacao da nota.
+  Stream<Note?> watchNote({required String uid}) => _notes
+      .doc(uid)
+      .snapshots()
+      .map((snapshot) => snapshot.exists ? Note.fromFirestore(snapshot) : null);
 
   Future<String?> clearAllNotes() async {
     try {
