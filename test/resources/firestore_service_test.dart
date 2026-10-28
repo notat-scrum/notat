@@ -125,6 +125,40 @@ void main() {
       },
     );
 
+    test('criar a nota sem titulo grava untitled', () async {
+      await servico.addDocument(
+        document: '[{"insert":"conteudo\\n"}]',
+        title: '',
+        searchableDocument: 'conteudo',
+        date: DateTime(2026, 10, 28),
+      );
+
+      final salva = (await notas(db).get()).docs.single.data();
+      expect(salva['title'], 'untitled');
+    });
+
+    test('editar a nota apagando o titulo grava untitled', () async {
+      await servico.addDocument(
+        document: '[{"insert":"conteudo\\n"}]',
+        title: 'Com titulo',
+        searchableDocument: 'conteudo',
+        date: DateTime(2026, 10, 28),
+      );
+      final noteUid = (await notas(db).get()).docs.single.id;
+
+      await servico.updateDocument(
+        document: '[{"insert":"conteudo\\n"}]',
+        searchableDocument: 'conteudo',
+        title: '',
+        folder: 'All',
+        noteUid: noteUid,
+        date: DateTime(2026, 10, 28, 12),
+      );
+
+      final salva = (await notas(db).doc(noteUid).get()).data()!;
+      expect(salva['title'], 'untitled');
+    });
+
     test('excluir a nota tira o documento da colecao', () async {
       await servico.addDocument(
         document: '[{"insert":"conteudo\\n"}]',
