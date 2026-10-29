@@ -10,6 +10,9 @@ class Note {
     required this.date,
   });
 
+  /// O titulo de uma nota gravada sem titulo.
+  static const tituloPadrao = 'untitled';
+
   /// Monta a nota como ela e gravada, a partir do que veio do editor. Criar e
   /// editar passam por aqui, para nao gravarem a nota de jeitos diferentes.
   factory Note.fromEditor({
@@ -22,7 +25,7 @@ class Note {
   }) {
     return Note(
       uid: uid,
-      title: title.isNotEmpty ? title : 'untitled',
+      title: title.isNotEmpty ? title : tituloPadrao,
       document: document,
       searchableDocument: plainText.toLowerCase().replaceAll('\n', ' ').trim(),
       folderId: folderId,
@@ -34,7 +37,7 @@ class Note {
     final dados = doc.data() ?? const <String, dynamic>{};
     return Note(
       uid: dados['uid'] as String? ?? doc.id,
-      title: dados['title'] as String? ?? 'untitled',
+      title: dados['title'] as String? ?? tituloPadrao,
       document: dados['document'] as String? ?? '',
       searchableDocument: dados['searchableDocument'] as String? ?? '',
       folderId: dados['folderId'] as String? ?? 'All',
