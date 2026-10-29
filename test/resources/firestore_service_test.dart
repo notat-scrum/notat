@@ -200,7 +200,7 @@ void main() {
       );
       final salva = (await notas(db).get()).docs.single;
 
-      // o reenvio da mesma gravacao, como o SDK faz quando a conexao volta
+      // gravar de novo com o mesmo id sobrescreve o documento, sem criar outro
       for (var envio = 0; envio < 2; envio++) {
         await servico.updateDocument(
           document: salva.data()['document'] as String,
