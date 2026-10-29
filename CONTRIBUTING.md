@@ -64,32 +64,31 @@ docs: reescreve o README com o setup do projeto (#37)
 
 Tipos em uso: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `ci`, `infra`.
 
-**Uma issue, um commit.** Se a issue precisa de dois commits, ou ela era duas issues, ou o segundo
-commit é conserto do primeiro e cabe um `git commit --amend` antes do push.
+**Uma issue, um commit de mudança.** O teste escrito antes da mudança vai num commit próprio, que
+entra antes da correção ou da refatoração. Assim o histórico mostra o teste vermelho, ou a regressão
+verde, antes do código mudar. Fora isso, se a issue precisa de dois commits, ou ela era duas issues, ou
+o segundo commit é conserto do primeiro e cabe um `git commit --amend` antes do push.
 
 Só use corpo no commit quando a mudança é ampla e o cabeçalho não dá conta. Aí o corpo vira bullets
 explicando o porquê, não a lista do que mudou, que o diff já mostra.
 
 ## Pull requests
 
-Abra o PR contra a `master`. O corpo segue esta estrutura:
+Abra o PR contra a `master`. O título é uma frase no presente dizendo o que o PR entrega, sem número
+de issue: `Destrava o build do Android e coloca o projeto de pé`.
 
-```markdown
-## Por que
-O que estava errado ou faltando, em dois parágrafos no máximo.
+O corpo já vem preenchido pelo modelo em
+[`.github/pull_request_template.md`](.github/pull_request_template.md). Ele segue esta estrutura:
 
-## Verificação
-A saída real dos comandos, colada. Não escreva que passou; mostre.
+- **Por que:** a issue e o critério de aceite atendidos, em dois parágrafos no máximo.
+- **Verificação:** a saída real dos comandos, colada. Não escreva que passou; mostre. Inclui o teste
+  escrito antes da mudança e os prints da validação no aparelho.
+- **O que mudou:** uma subseção `###` por assunto.
+- **Checklist da Definition of Done**, a mesma do README.
+- **`Closes #N`** no fim.
 
-## O que mudou
-Uma subseção `###` por assunto.
-
----
-
-Closes #1, closes #2
-```
-
-Repita a palavra `closes` em cada número. O GitHub só fecha as issues assim.
+Repita a palavra `closes` em cada número. O GitHub só fecha as issues assim. Se o PR entrega só parte
+da issue, escreva `Parte da #N`.
 
 Antes de pedir review, rode o que o CI roda:
 
