@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:notat/providers/falha_gravacao_provider.dart';
 import 'package:notat/resources/auth_methods.dart';
 import 'package:notat/resources/firestore_methods.dart';
 import 'package:notat/resources/firstore_folder_methods.dart';
@@ -35,7 +36,11 @@ final firestoreServiceProvider = Provider<FirestoreService>((ref) {
   if (uid == null) {
     throw StateError('FirestoreService lido sem usuario autenticado');
   }
-  return FirestoreService(ref.watch(firebaseFirestoreProvider), uid);
+  return FirestoreService(
+    ref.watch(firebaseFirestoreProvider),
+    uid,
+    aoFalharGravacao: ref.watch(falhaGravacaoProvider.notifier).avisa,
+  );
 });
 
 final firestoreFolderServiceProvider = Provider<FirestoreFolderService>((ref) {

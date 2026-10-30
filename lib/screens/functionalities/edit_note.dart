@@ -8,7 +8,6 @@ import 'package:notat/screens/errorAndLoading/error_screen.dart';
 import 'package:notat/screens/errorAndLoading/loading_screen.dart';
 import 'package:notat/widgets/notesRelated/custom_app_bar.dart';
 import 'package:notat/widgets/notesRelated/note_header.dart';
-import 'package:notat/widgets/reusedComponents/snackbar.dart';
 import 'package:flutter_quill/flutter_quill.dart' as editor;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -80,7 +79,7 @@ class EditNoteState extends ConsumerState<EditNote> {
                               );
                               String plainText = controller.document
                                   .toPlainText();
-                              final erro = await ref
+                              await ref
                                   .read(firestoreServiceProvider)
                                   .updateDocument(
                                     folder: selected.value ?? nota.folderId,
@@ -91,13 +90,6 @@ class EditNoteState extends ConsumerState<EditNote> {
                                     date: DateTime.now(),
                                   );
                               if (!context.mounted) return;
-                              if (erro != null) {
-                                CustomSnackBar.show(
-                                  context,
-                                  erro,
-                                  Duration(seconds: 2),
-                                );
-                              }
                               Navigator.of(context).pop();
                             },
                           ),

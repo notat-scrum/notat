@@ -6,6 +6,8 @@ import 'package:notat/resources/auth_methods.dart';
 import 'package:notat/resources/firestore_methods.dart';
 import 'package:notat/resources/firstore_folder_methods.dart';
 
+import 'firestore_controlado.dart';
+
 const uid = 'usuario-de-teste';
 
 // Contrato alvo da #25: as notas e as pastas vivem embaixo de users/{uid} e a
@@ -30,14 +32,13 @@ void main() {
 
   group('notas', () {
     test('cria a nota em users/{uid}/notes', () async {
-      final erro = await servico.addDocument(
+      await servico.addDocument(
         document: '[{"insert":"conteudo\\n"}]',
         title: 'Primeira',
         searchableDocument: 'conteudo',
         date: DateTime(2026, 9, 3),
       );
 
-      expect(erro, isNull);
       final salvas = await notas(db).get();
       expect(salvas.docs, hasLength(1));
       expect(salvas.docs.single.data()['title'], 'Primeira');
@@ -69,7 +70,7 @@ void main() {
         );
         final noteUid = (await notas(db).get()).docs.single.id;
 
-        final erro = await servico.updateDocument(
+        await servico.updateDocument(
           document: '[{"insert":"novo\\n"}]',
           searchableDocument: 'novo',
           title: 'Editada',
@@ -78,7 +79,6 @@ void main() {
           date: DateTime(2026, 9, 4),
         );
 
-        expect(erro, isNull);
         final salva = (await notas(db).doc(noteUid).get()).data()!;
         expect(salva['title'], 'Editada');
         expect(salva['folderId'], 'Trabalho');
@@ -154,6 +154,107 @@ void main() {
       expect((await notas(db).get()).docs, isEmpty);
       expect((await pastas(db).get()).docs, isNotEmpty);
     });
+  });
+
+  group('sincronizacao offline', () {
+    test('addDocument retorna sem esperar o servidor confirmar', () async {
+      final semInternet = FirestoreControlado();
+
+      await FirestoreService(semInternet, uid)
+          .addDocument(
+            document: '[{"insert":"conteudo\\n"}]',
+            title: 'Offline',
+            searchableDocument: 'conteudo',
+            date: DateTime(2026, 10, 27),
+          )
+          .timeout(const Duration(seconds: 1));
+
+      expect(semInternet.gravacoes, hasLength(1));
+      expect(semInternet.gravacoes.single.isCompleted, isFalse);
+    });
+
+    test('updateDocument retorna sem esperar o servidor confirmar', () async {
+      final semInternet = FirestoreControlado();
+
+      await FirestoreService(semInternet, uid)
+          .updateDocument(
+            document: '[{"insert":"conteudo\\n"}]',
+            searchableDocument: 'conteudo',
+            title: 'Offline',
+            folder: 'All',
+            noteUid: 'nota-offline',
+            date: DateTime(2026, 10, 27),
+          )
+          .timeout(const Duration(seconds: 1));
+
+      expect(semInternet.gravacoes, hasLength(1));
+      expect(semInternet.gravacoes.single.isCompleted, isFalse);
+    });
+
+    test('gravar a mesma nota duas vezes deixa um documento so', () async {
+      await servico.addDocument(
+        document: '[{"insert":"conteudo\\n"}]',
+        title: 'Offline',
+        searchableDocument: 'conteudo',
+        date: DateTime(2026, 10, 27),
+      );
+      final salva = (await notas(db).get()).docs.single;
+
+      // gravar de novo com o mesmo id sobrescreve o documento, sem criar outro
+      for (var envio = 0; envio < 2; envio++) {
+        await servico.updateDocument(
+          document: salva.data()['document'] as String,
+          searchableDocument: salva.data()['searchableDocument'] as String,
+          title: salva.data()['title'] as String,
+          folder: salva.data()['folderId'] as String,
+          noteUid: salva.id,
+          date: DateTime(2026, 10, 27),
+        );
+      }
+
+      final salvas = await notas(db).get();
+      expect(salvas.docs, hasLength(1));
+      expect(
+        salvas.docs.single.data()['document'],
+        '[{"insert":"conteudo\\n"}]',
+      );
+    });
+
+    test(
+      'duas edicoes seguidas deixam um documento so, com a ultima versao',
+      () async {
+        await servico.addDocument(
+          document: '[{"insert":"original\\n"}]',
+          title: 'Original',
+          searchableDocument: 'original',
+          date: DateTime(2026, 10, 27),
+        );
+        final noteUid = (await notas(db).get()).docs.single.id;
+
+        await servico.updateDocument(
+          document: '[{"insert":"primeira edicao\\n"}]',
+          searchableDocument: 'primeira edicao',
+          title: 'Primeira edicao',
+          folder: 'All',
+          noteUid: noteUid,
+          date: DateTime(2026, 10, 27, 10),
+        );
+        await servico.updateDocument(
+          document: '[{"insert":"segunda edicao\\n"}]',
+          searchableDocument: 'segunda edicao',
+          title: 'Segunda edicao',
+          folder: 'All',
+          noteUid: noteUid,
+          date: DateTime(2026, 10, 27, 11),
+        );
+
+        final salvas = await notas(db).get();
+        expect(salvas.docs, hasLength(1));
+        final salva = salvas.docs.single.data();
+        expect(salva['title'], 'Segunda edicao');
+        expect(salva['document'], '[{"insert":"segunda edicao\\n"}]');
+      },
+    );
   });
 
   group('pastas', () {

@@ -12,6 +12,7 @@ import 'package:notat/screens/authentication/signup_screen.dart';
 import 'package:notat/screens/functionalities/home_page.dart';
 import 'package:notat/screens/wrapper.dart';
 import 'package:notat/utils/colors.dart';
+import 'package:notat/widgets/reusedComponents/aviso_falha_gravacao.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 const bool _usarEmulador = bool.fromEnvironment('USE_FIREBASE_EMULATOR');
@@ -56,6 +57,7 @@ class MyApp extends StatelessWidget {
       supportedLocales: const [Locale('en')],
       debugShowCheckedModeBanner: false,
       theme: CustomTheme.darkTheme,
+      builder: (context, child) => AvisoFalhaGravacao(child: child!),
       home: const Wrapper(),
       routes: {
         'Login': (context) => const LoginScreen(),
