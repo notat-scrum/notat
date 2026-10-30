@@ -108,4 +108,4 @@ squash apaga isso.
 
 ## Rodar o projeto
 
-O setup, do zero, está no [README](README.md)
+O setup, do zero, está no [README](README.md).
