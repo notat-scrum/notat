@@ -12,11 +12,11 @@ histórico no terminal. Nos demais textos, escreva com acento normalmente.
 
 O [quadro do projeto](https://github.com/orgs/notat-scrum/projects/1) tem três colunas:
 
-| Coluna | Quando |
-|---|---|
-| Backlog | a issue existe e ninguém pegou |
+| Coluna             | Quando                                              |
+| ------------------ | --------------------------------------------------- |
+| Backlog            | a issue existe e ninguém pegou                      |
 | Em desenvolvimento | alguém começou, mesmo que ainda não tenha commitado |
-| Pronto | o PR que fecha a issue foi mergeado |
+| Pronto             | o PR que fecha a issue foi mergeado                 |
 
 Mova o card quando o estado muda, não no fim do trabalho. Quem olha o quadro precisa saber o que está
 acontecendo agora.
@@ -108,4 +108,4 @@ squash apaga isso.
 
 ## Rodar o projeto
 
-O setup, do zero, está no [README](README.md).
+O setup, do zero, está no [README](README.md)
