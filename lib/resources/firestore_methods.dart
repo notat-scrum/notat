@@ -27,20 +27,16 @@ class FirestoreService {
     String folder = 'All',
     required DateTime date,
   }) async {
-    final String uid = const Uuid().v4();
-    final Note note = Note(
-      folderId: folder,
-      document: document,
-      searchableDocument: searchableDocument
-          .toLowerCase()
-          .replaceAll('\n', ' ')
-          .trim(),
-      date: date,
-      uid: uid,
-      title: title.isNotEmpty ? title : 'untitled',
+    _gravaSemEsperar(
+      Note.fromEditor(
+        uid: const Uuid().v4(),
+        title: title,
+        document: document,
+        plainText: searchableDocument,
+        folderId: folder,
+        date: date,
+      ),
     );
-
-    _gravaSemEsperar(note);
   }
 
   Future<void> updateDocument({
@@ -51,19 +47,16 @@ class FirestoreService {
     required String noteUid,
     required DateTime date,
   }) async {
-    final Note note = Note(
-      folderId: folder,
-      searchableDocument: searchableDocument
-          .toLowerCase()
-          .replaceAll('\n', ' ')
-          .trim(),
-      document: document,
-      date: date,
-      uid: noteUid,
-      title: title.isNotEmpty ? title : 'untitled',
+    _gravaSemEsperar(
+      Note.fromEditor(
+        uid: noteUid,
+        title: title,
+        document: document,
+        plainText: searchableDocument,
+        folderId: folder,
+        date: date,
+      ),
     );
-
-    _gravaSemEsperar(note);
   }
 
   // o set() so completa quando o servidor confirma; sem internet ele fica
