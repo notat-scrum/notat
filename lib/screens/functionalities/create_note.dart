@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:notat/providers/auth_provider.dart';
 import 'package:notat/widgets/notesRelated/custom_app_bar.dart';
 import 'package:notat/widgets/notesRelated/note_header.dart';
-import 'package:notat/widgets/reusedComponents/snackbar.dart';
 import 'package:flutter_quill/flutter_quill.dart' as editor;
 
 class CreateNote extends ConsumerStatefulWidget {
@@ -48,7 +47,7 @@ class _CreateNoteState extends ConsumerState<CreateNote> {
                         _controller.document.toDelta().toJson(),
                       );
                       String plainText = _controller.document.toPlainText();
-                      final erro = await ref
+                      await ref
                           .read(firestoreServiceProvider)
                           .addDocument(
                             document: json,
@@ -58,13 +57,6 @@ class _CreateNoteState extends ConsumerState<CreateNote> {
                             date: DateTime.now(),
                           );
                       if (!context.mounted) return;
-                      if (erro != null) {
-                        CustomSnackBar.show(
-                          context,
-                          erro,
-                          Duration(seconds: 2),
-                        );
-                      }
                       Navigator.pop(context);
                     },
                   ),
