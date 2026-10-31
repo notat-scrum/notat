@@ -90,7 +90,10 @@ class FirestoreService {
 
   Future<String?> clearAllNotes() async {
     try {
-      await _apagaEmLote(await _notes.get());
+      final documentos = await _notes.get(
+        const GetOptions(source: Source.cache),
+      );
+      await _apagaEmLote(documentos);
     } on FirebaseException catch (e) {
       return e.message;
     }
@@ -99,9 +102,10 @@ class FirestoreService {
 
   Future<String?> deleteDocsOfFolder(String folder) async {
     try {
-      await _apagaEmLote(
-        await _notes.where('folderId', isEqualTo: folder).get(),
-      );
+      final documentos = await _notes
+          .where('folderId', isEqualTo: folder)
+          .get(const GetOptions(source: Source.cache));
+      await _apagaEmLote(documentos);
     } on FirebaseException catch (e) {
       return e.message;
     }
