@@ -2,15 +2,12 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:notat/models/note.dart';
-import 'package:notat/resources/firstore_folder_methods.dart';
 import 'package:uuid/uuid.dart';
 
 class FirestoreService {
-  FirestoreService(this._firestore, this.userUid, {this.aoFalharGravacao})
-    : firestoreFolder = FirestoreFolderService(_firestore, userUid);
+  FirestoreService(this._firestore, this.userUid, {this.aoFalharGravacao});
 
   final FirebaseFirestore _firestore;
-  final FirestoreFolderService firestoreFolder;
   final String userUid;
 
   /// Recebe a mensagem quando o servidor recusa a gravacao de uma nota. Sem ele
@@ -19,6 +16,9 @@ class FirestoreService {
 
   CollectionReference<Map<String, dynamic>> get _notes =>
       _firestore.collection('users').doc(userUid).collection('notes');
+
+  CollectionReference<Map<String, dynamic>> get _folders =>
+      _firestore.collection('users').doc(userUid).collection('folders');
 
   Future<void> addDocument({
     required String document,
@@ -90,7 +90,10 @@ class FirestoreService {
 
   Future<String?> clearAllNotes() async {
     try {
-      await _apagaEmLote(await _notes.get());
+      final documentos = await _notes.get(
+        const GetOptions(source: Source.cache),
+      );
+      await _apagaEmLote(documentos);
     } on FirebaseException catch (e) {
       return e.message;
     }
@@ -99,9 +102,10 @@ class FirestoreService {
 
   Future<String?> deleteDocsOfFolder(String folder) async {
     try {
-      await _apagaEmLote(
-        await _notes.where('folderId', isEqualTo: folder).get(),
-      );
+      final documentos = await _notes
+          .where('folderId', isEqualTo: folder)
+          .get(const GetOptions(source: Source.cache));
+      await _apagaEmLote(documentos);
     } on FirebaseException catch (e) {
       return e.message;
     }
@@ -120,7 +124,7 @@ class FirestoreService {
   Future<String?> deleteAllDocs() async {
     try {
       await _apagaEmLote(await _notes.get());
-      await _apagaEmLote(await firestoreFolder.folders.get());
+      await _apagaEmLote(await _folders.get());
     } on FirebaseException catch (e) {
       return e.message;
     }

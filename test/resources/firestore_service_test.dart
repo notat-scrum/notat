@@ -19,6 +19,46 @@ CollectionReference<Map<String, dynamic>> notas(FirebaseFirestore db) =>
 CollectionReference<Map<String, dynamic>> pastas(FirebaseFirestore db) =>
     db.collection('users').doc(uid).collection('folders');
 
+class FirestoreComEspiaoDeLote extends FakeFirebaseFirestore {
+  final List<List<DocumentReference>> lotes = [];
+
+  @override
+  WriteBatch batch() {
+    final loteOriginal = super.batch();
+    return _LoteEspiao(loteOriginal, (deletados) => lotes.add(deletados));
+  }
+}
+
+class _LoteEspiao implements WriteBatch {
+  _LoteEspiao(this._inner, this._onCommit);
+
+  final WriteBatch _inner;
+  final void Function(List<DocumentReference>) _onCommit;
+  final List<DocumentReference> _deletados = [];
+
+  @override
+  void delete(DocumentReference document) {
+    _deletados.add(document);
+    _inner.delete(document);
+  }
+
+  @override
+  void set<T>(DocumentReference<T> document, T data, [SetOptions? options]) {
+    _inner.set(document, data, options);
+  }
+
+  @override
+  void update<T>(DocumentReference<T> document, T data) {
+    _inner.update(document, data);
+  }
+
+  @override
+  Future<void> commit() {
+    _onCommit(List.unmodifiable(_deletados));
+    return _inner.commit();
+  }
+}
+
 void main() {
   late FakeFirebaseFirestore db;
   late FirestoreService servico;
@@ -188,6 +228,32 @@ void main() {
       expect((await notas(db).get()).docs, isEmpty);
       expect((await pastas(db).get()).docs, isNotEmpty);
     });
+
+    test(
+      'deleteDocsOfFolder apaga apenas as notas da pasta solicitada',
+      () async {
+        await servico.addDocument(
+          document: '[{"insert":"1\\n"}]',
+          title: 'Pasta A',
+          searchableDocument: '1',
+          folder: 'PastaA',
+          date: DateTime(2026, 9, 3),
+        );
+        await servico.addDocument(
+          document: '[{"insert":"2\\n"}]',
+          title: 'Pasta B',
+          searchableDocument: '2',
+          folder: 'PastaB',
+          date: DateTime(2026, 9, 3),
+        );
+
+        await servico.deleteDocsOfFolder('PastaA');
+
+        final restantes = await notas(db).get();
+        expect(restantes.docs, hasLength(1));
+        expect(restantes.docs.single.data()['title'], 'Pasta B');
+      },
+    );
   });
 
   group('sincronizacao offline', () {
@@ -323,6 +389,47 @@ void main() {
       final restantes = await notas(db).get();
       expect(restantes.docs, hasLength(1));
       expect(restantes.docs.single.data()['title'], 'Fora');
+    });
+
+    test('excluir a pasta apaga a pasta e as notas num unico lote', () async {
+      final dbEspiao = FirestoreComEspiaoDeLote();
+      final pastasEspiao = FirestoreFolderService(dbEspiao, uid);
+      final servicoEspiao = FirestoreService(dbEspiao, uid);
+
+      await pastasEspiao.createFolder('Trabalho');
+      await servicoEspiao.addDocument(
+        document: '[{"insert":"conteudo\\n"}]',
+        title: 'Dentro',
+        searchableDocument: 'conteudo',
+        folder: 'Trabalho',
+        date: DateTime(2026, 9, 3),
+      );
+
+      await pastasEspiao.deleteFolder('Trabalho');
+
+      expect(dbEspiao.lotes, hasLength(1));
+      final caminhosDeletados = dbEspiao.lotes.single
+          .map((r) => r.path)
+          .toList();
+      expect(caminhosDeletados, contains('users/$uid/folders/Trabalho'));
+      expect(caminhosDeletados, anyElement(contains('users/$uid/notes/')));
+    });
+
+    test('deleteFolder All nao apaga nada', () async {
+      await servicoPastas.createMainFolder();
+      await servico.addDocument(
+        document: '[{"insert":"conteudo\\n"}]',
+        title: 'Na All',
+        searchableDocument: 'conteudo',
+        folder: 'All',
+        date: DateTime(2026, 9, 3),
+      );
+
+      final erro = await servicoPastas.deleteFolder('All');
+
+      expect(erro, isNull);
+      expect((await pastas(db).get()).docs, isNotEmpty);
+      expect((await notas(db).get()).docs, hasLength(1));
     });
   });
 

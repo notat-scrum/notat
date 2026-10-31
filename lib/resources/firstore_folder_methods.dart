@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:notat/resources/firestore_methods.dart';
 
 class FirestoreFolderService {
   FirestoreFolderService(this._firestore, this.userUid);
@@ -12,6 +11,9 @@ class FirestoreFolderService {
   /// caminho no Firestore.
   CollectionReference<Map<String, dynamic>> get folders =>
       _firestore.collection('users').doc(userUid).collection('folders');
+
+  CollectionReference<Map<String, dynamic>> get _notes =>
+      _firestore.collection('users').doc(userUid).collection('notes');
 
   static bool nomeValido(String name) =>
       name.isNotEmpty && !name.contains('/') && name.trim() == name;
@@ -35,8 +37,16 @@ class FirestoreFolderService {
       return null;
     }
     try {
-      await FirestoreService(_firestore, userUid).deleteDocsOfFolder(name);
-      await folders.doc(name).delete();
+      final notasDaPasta = await _notes
+          .where('folderId', isEqualTo: name)
+          .get(const GetOptions(source: Source.cache));
+
+      final lote = _firestore.batch();
+      lote.delete(folders.doc(name));
+      for (final doc in notasDaPasta.docs) {
+        lote.delete(doc.reference);
+      }
+      await lote.commit();
     } on FirebaseException catch (e) {
       return e.message;
     }
