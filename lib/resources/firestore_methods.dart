@@ -90,12 +90,9 @@ class FirestoreService {
 
   Future<String?> clearAllNotes() async {
     try {
-      QuerySnapshot<Map<String, dynamic>> documentos;
-      try {
-        documentos = await _notes.get(const GetOptions(source: Source.cache));
-      } catch (_) {
-        documentos = await _notes.get();
-      }
+      final documentos = await _notes.get(
+        const GetOptions(source: Source.cache),
+      );
       await _apagaEmLote(documentos);
     } on FirebaseException catch (e) {
       return e.message;
@@ -105,14 +102,9 @@ class FirestoreService {
 
   Future<String?> deleteDocsOfFolder(String folder) async {
     try {
-      QuerySnapshot<Map<String, dynamic>> documentos;
-      try {
-        documentos = await _notes
-            .where('folderId', isEqualTo: folder)
-            .get(const GetOptions(source: Source.cache));
-      } catch (_) {
-        documentos = await _notes.where('folderId', isEqualTo: folder).get();
-      }
+      final documentos = await _notes
+          .where('folderId', isEqualTo: folder)
+          .get(const GetOptions(source: Source.cache));
       await _apagaEmLote(documentos);
     } on FirebaseException catch (e) {
       return e.message;
@@ -131,29 +123,8 @@ class FirestoreService {
 
   Future<String?> deleteAllDocs() async {
     try {
-      QuerySnapshot<Map<String, dynamic>> notasDocs;
-      QuerySnapshot<Map<String, dynamic>> pastasDocs;
-      try {
-        notasDocs = await _notes.get(const GetOptions(source: Source.cache));
-      } catch (_) {
-        notasDocs = await _notes.get();
-      }
-      try {
-        pastasDocs = await firestoreFolder.folders.get(
-          const GetOptions(source: Source.cache),
-        );
-      } catch (_) {
-        pastasDocs = await firestoreFolder.folders.get();
-      }
-
-      final lote = _firestore.batch();
-      for (final doc in notasDocs.docs) {
-        lote.delete(doc.reference);
-      }
-      for (final doc in pastasDocs.docs) {
-        lote.delete(doc.reference);
-      }
-      await lote.commit();
+      await _apagaEmLote(await _notes.get());
+      await _apagaEmLote(await firestoreFolder.folders.get());
     } on FirebaseException catch (e) {
       return e.message;
     }

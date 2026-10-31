@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirestoreFolderService {
@@ -39,14 +37,9 @@ class FirestoreFolderService {
       return null;
     }
     try {
-      QuerySnapshot<Map<String, dynamic>> notasDaPasta;
-      try {
-        notasDaPasta = await _notes
-            .where('folderId', isEqualTo: name)
-            .get(const GetOptions(source: Source.cache));
-      } catch (_) {
-        notasDaPasta = await _notes.where('folderId', isEqualTo: name).get();
-      }
+      final notasDaPasta = await _notes
+          .where('folderId', isEqualTo: name)
+          .get(const GetOptions(source: Source.cache));
 
       final lote = _firestore.batch();
       lote.delete(folders.doc(name));
