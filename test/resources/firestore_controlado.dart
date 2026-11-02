@@ -3,12 +3,14 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Firestore em que o set() so termina quando o teste manda. Sem internet o SDK
-/// de verdade se comporta assim: a escrita entra no cache local e o Future do
-/// set() fica pendente ate o servidor responder, o que pode nunca acontecer.
+/// Firestore em que as operacoes so terminam quando o teste manda.
+/// Isso permite simular sucesso, falha e operacoes pendentes.
 class FirestoreControlado extends Fake implements FirebaseFirestore {
   /// Uma entrada por set() chamado, na ordem das chamadas.
   final List<Completer<void>> gravacoes = [];
+
+  /// Uma entrada por delete() chamado, na ordem das chamadas.
+  final List<Completer<void>> exclusoes = [];
 
   @override
   CollectionReference<Map<String, dynamic>> collection(String collectionPath) =>
@@ -43,5 +45,12 @@ class _Documento extends Fake
     final gravacao = Completer<void>();
     _firestore.gravacoes.add(gravacao);
     return gravacao.future;
+  }
+
+  @override
+  Future<void> delete() {
+    final exclusao = Completer<void>();
+    _firestore.exclusoes.add(exclusao);
+    return exclusao.future;
   }
 }
