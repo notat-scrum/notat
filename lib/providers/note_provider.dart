@@ -1,43 +1,23 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:notat/models/note.dart';
 import 'package:notat/providers/auth_provider.dart';
+import 'package:notat/providers/user_collections_provider.dart';
 
-final notesProvider = StreamProvider<List<Note>>((ref) {
-  final uid = ref.watch(currentUidProvider);
-  if (uid == null) {
-    // deslogado nao e carregando: Stream.empty nunca emite e a tela ficaria
-    // presa no indicador de progresso
-    return Stream.value(const <Note>[]);
-  }
-  return ref
-      .watch(firebaseFirestoreProvider)
-      .collection('users')
-      .doc(uid)
-      .collection('notes')
-      .orderBy('date', descending: true)
-      .snapshots()
-      .map((consulta) => consulta.docs.map(Note.fromFirestore).toList());
-});
+final notesProvider = StreamProvider<List<Note>>(
+  (ref) => watchUserNotes<Note>(
+    ref,
+    (notes) => notes.orderBy('date', descending: true),
+    Note.fromFirestore,
+  ),
+);
 
-final notesInFolderProvider = StreamProvider.family<List<Note>, String>((
-  ref,
-  folder,
-) {
-  final uid = ref.watch(currentUidProvider);
-  if (uid == null) {
-    // deslogado nao e carregando: Stream.empty nunca emite e a tela ficaria
-    // presa no indicador de progresso
-    return Stream.value(const <Note>[]);
-  }
-  return ref
-      .watch(firebaseFirestoreProvider)
-      .collection('users')
-      .doc(uid)
-      .collection('notes')
-      .where('folderId', isEqualTo: folder)
-      .snapshots()
-      .map((consulta) => consulta.docs.map(Note.fromFirestore).toList());
-});
+final notesInFolderProvider = StreamProvider.family<List<Note>, String>(
+  (ref, folder) => watchUserNotes<Note>(
+    ref,
+    (notes) => notes.where('folderId', isEqualTo: folder),
+    Note.fromFirestore,
+  ),
+);
 
 // autoDispose: sem ele a primeira leitura fica guardada enquanto o app estiver
 // aberto, e a tela de edicao reabre a nota na versao anterior

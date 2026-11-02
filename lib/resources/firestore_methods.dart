@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:notat/models/note.dart';
+import 'package:notat/resources/user_collections.dart';
 import 'package:uuid/uuid.dart';
 
 class FirestoreService {
@@ -15,10 +16,10 @@ class FirestoreService {
   final void Function(String mensagem)? aoFalharGravacao;
 
   CollectionReference<Map<String, dynamic>> get _notes =>
-      _firestore.collection('users').doc(userUid).collection('notes');
+      _firestore.notesOf(userUid);
 
   CollectionReference<Map<String, dynamic>> get _folders =>
-      _firestore.collection('users').doc(userUid).collection('folders');
+      _firestore.foldersOf(userUid);
 
   Future<void> addDocument({
     required String document,
