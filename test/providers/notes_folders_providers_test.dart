@@ -25,8 +25,8 @@ void main() {
     return container;
   }
 
-  // Todo provider e auto-dispose no Riverpod 3. O listen mantem o provider
-  // vivo enquanto o teste le o primeiro valor do stream.
+  // O listen mantem o provider assinado enquanto o teste le o primeiro valor
+  // do stream.
   Future<T> ler<T>(ProviderContainer container, StreamProvider<T> provider) {
     container.listen(provider, (anterior, atual) {});
     return container.read(provider.future);
