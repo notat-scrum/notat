@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -18,18 +17,12 @@ void main() {
         overrides: [
           firebaseFirestoreProvider.overrideWithValue(firestore),
           currentUidProvider.overrideWithValue('usuario-de-teste'),
-          notesProvider.overrideWith(
-            (ref) => Stream.value([]),
-          ),
-          folderProvider.overrideWith(
-            (ref) => Stream.value([]),
-          ),
+          notesProvider.overrideWith((ref) => Stream.value([])),
+          folderProvider.overrideWith((ref) => Stream.value([])),
         ],
         child: MaterialApp(
           theme: ThemeData(
-            tabBarTheme: const TabBarThemeData(
-              labelColor: Colors.blue,
-            ),
+            tabBarTheme: const TabBarThemeData(labelColor: Colors.blue),
           ),
           home: const HomePage(),
         ),
@@ -49,9 +42,6 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300));
 
     // Verifica se o erro retornado pelo Firebase aparece.
-    expect(
-      find.text('Missing or insufficient permissions.'),
-      findsOneWidget,
-    );
+    expect(find.text('Missing or insufficient permissions.'), findsOneWidget);
   });
 }
