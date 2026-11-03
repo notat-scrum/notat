@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:notat/resources/user_collections.dart';
 
 class FirestoreFolderService {
   FirestoreFolderService(this._firestore, this.userUid);
@@ -10,10 +11,10 @@ class FirestoreFolderService {
   /// em folderId. Por isso o nome nao pode conter barra: ela dividiria o
   /// caminho no Firestore.
   CollectionReference<Map<String, dynamic>> get folders =>
-      _firestore.collection('users').doc(userUid).collection('folders');
+      _firestore.foldersOf(userUid);
 
   CollectionReference<Map<String, dynamic>> get _notes =>
-      _firestore.collection('users').doc(userUid).collection('notes');
+      _firestore.notesOf(userUid);
 
   static bool nomeValido(String name) =>
       name.isNotEmpty && !name.contains('/') && name.trim() == name;
