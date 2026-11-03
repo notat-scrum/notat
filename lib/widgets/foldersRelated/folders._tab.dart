@@ -8,6 +8,7 @@ import 'package:notat/widgets/notesRelated/notes_inside_folder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
+import 'package:notat/widgets/reusedComponents/snackbar.dart';
 
 class FoldersTab extends ConsumerStatefulWidget {
   const FoldersTab({super.key});
@@ -34,6 +35,7 @@ class _FoldersTabState extends ConsumerState<FoldersTab> {
         body: Consumer(
           builder: ((context, ref, child) {
             final streamProv = ref.watch(folderProvider);
+
             return streamProv.when(
               data: ((keys) {
                 return GridView.builder(
@@ -84,6 +86,7 @@ class _FoldersTabState extends ConsumerState<FoldersTab> {
                         ),
                       );
                     }
+
                     return FocusedMenuHolder(
                       duration: const Duration(milliseconds: 100),
                       menuWidth: 250,
@@ -106,9 +109,19 @@ class _FoldersTabState extends ConsumerState<FoldersTab> {
                                 ),
                                 title: const Text('Delete (All notes inside)'),
                                 onPressed: () async {
-                                  await ref
+                                  final erro = await ref
                                       .read(firestoreFolderServiceProvider)
                                       .deleteFolder(keys[index]);
+
+                                  if (!context.mounted) return;
+
+                                  if (erro != null) {
+                                    CustomSnackBar.show(
+                                      context,
+                                      erro,
+                                      const Duration(seconds: 3),
+                                    );
+                                  }
                                 },
                                 backgroundColor: Colors.redAccent,
                               ),

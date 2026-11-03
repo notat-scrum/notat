@@ -16,9 +16,11 @@ import 'package:notat/screens/errorAndLoading/error_screen.dart';
 import 'package:notat/screens/errorAndLoading/loading_screen.dart';
 import 'package:notat/screens/functionalities/edit_note.dart';
 import 'package:notat/widgets/reusedComponents/animation_transition.dart';
+import 'package:notat/widgets/reusedComponents/snackbar.dart';
 
 class NoteCards extends StatelessWidget {
   final AsyncValue<List<Note>> snapshot;
+
   const NoteCards(this.snapshot, {super.key});
 
   @override
@@ -28,6 +30,7 @@ class NoteCards extends StatelessWidget {
         if (notas.isEmpty) {
           return EmptyResult();
         }
+
         return MasonryGridView.builder(
           physics: const BouncingScrollPhysics(),
           mainAxisSpacing: 15,
@@ -59,9 +62,11 @@ class NoteCard extends ConsumerStatefulWidget {
 
 class _NoteCardState extends ConsumerState<NoteCard> {
   late quill.QuillController _controller;
+
   final ScrollController _scrollController = ScrollController(
     keepScrollOffset: false,
   );
+
   final FocusNode _focusNode = FocusNode();
 
   @override
@@ -73,6 +78,7 @@ class _NoteCardState extends ConsumerState<NoteCard> {
   @override
   void didUpdateWidget(NoteCard oldWidget) {
     super.didUpdateWidget(oldWidget);
+
     if (oldWidget.nota.document != widget.nota.document) {
       _controller.dispose();
       _controller = _criaController();
@@ -129,9 +135,15 @@ class _NoteCardState extends ConsumerState<NoteCard> {
           ),
           title: const Text('Delete'),
           onPressed: () async {
-            await ref
+            final erro = await ref
                 .read(firestoreServiceProvider)
                 .deleteNote(uid: widget.nota.uid);
+
+            if (!context.mounted) return;
+
+            if (erro != null) {
+              CustomSnackBar.show(context, erro, const Duration(seconds: 3));
+            }
           },
           backgroundColor: Colors.redAccent,
         ),

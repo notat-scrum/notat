@@ -70,9 +70,19 @@ class _HomePageState extends ConsumerState<HomePage>
                   itemBuilder: ((context) => [
                     PopupMenuItem(
                       onTap: () async {
-                        await ref
+                        final erro = await ref
                             .read(firestoreServiceProvider)
                             .clearAllNotes();
+
+                        if (!context.mounted) return;
+
+                        if (erro != null) {
+                          CustomSnackBar.show(
+                            context,
+                            erro,
+                            const Duration(seconds: 3),
+                          );
+                        }
                       },
                       value: 1,
                       child: const Text('Clear All notes'),
@@ -82,7 +92,9 @@ class _HomePageState extends ConsumerState<HomePage>
                         final auth = ref.read(authServiceProvider);
                         await auth.reloadUser();
                         final erro = await auth.signOut();
+
                         if (!context.mounted) return;
+
                         if (erro != null) {
                           CustomSnackBar.show(
                             context,
@@ -90,6 +102,7 @@ class _HomePageState extends ConsumerState<HomePage>
                             Duration(seconds: 2),
                           );
                         }
+
                         Navigator.of(context).pushAndRemoveUntil(
                           FadeTrans(translateTo: const Wrapper()),
                           (rota) => false,
