@@ -25,6 +25,15 @@ class _Colecao extends Fake
   final FirestoreControlado _firestore;
 
   @override
+  Future<QuerySnapshot<Map<String, dynamic>>> get([GetOptions? options]) async {
+    throw FirebaseException(
+      plugin: 'cloud_firestore',
+      code: 'permission-denied',
+      message: 'Missing or insufficient permissions.',
+    );
+  }
+
+  @override
   Query<Map<String, dynamic>> where(
     Object field, {
     Object? isEqualTo,
