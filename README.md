@@ -298,6 +298,154 @@ Os comandos para rodar os testes localmente estão em [Desenvolvimento](#desenvo
 | `fvm flutter test`                  | 55 testes passando                |
 | CI no GitHub Actions                | verde em todos os PRs da Sprint 2 |
 
+## Entrega N3
+
+Vídeo da demonstração: _a preencher._
+
+### User Story
+
+A fala da cliente para a Sprint 3:
+
+> Escrevi uma nota no celular, sem internet, e quando abri o app em outro aparelho ela não estava lá.
+> Em outro dia apareceu duplicada.
+
+#### US03: a nota aparece em todos os aparelhos, uma vez só
+
+> Como usuário que escreve notas no celular e abre a conta em outro aparelho, quero que cada nota
+> apareça em todos os meus aparelhos uma única vez e completa, e saber quando ela ainda não foi
+> enviada, para confiar que o que escrevi está guardado.
+
+Critérios de aceite:
+
+1. **Dado** que estou sem internet, **quando** salvo uma nota nova, **então** ela aparece na lista na
+   hora, marcada como aguardando envio.
+2. **Dado** uma nota aguardando envio, **quando** o aparelho em que ela foi escrita volta a ter
+   internet, **então** a marca some e a nota aparece no outro aparelho da mesma conta, uma vez só e com
+   o texto inteiro.
+3. **Dado** a tela de nota nova, **quando** toco duas vezes seguidas em Save, **então** fica uma nota
+   só e volto para a lista.
+4. **Dado** uma nota editada duas vezes sem internet, **quando** a conexão volta, **então** o servidor
+   guarda só a última versão, num documento só.
+5. **Dado** que o servidor recusa gravar ou excluir uma nota ou uma pasta, **quando** isso acontece,
+   **então** vejo uma mensagem que diz o que houve, e não o texto técnico do Firebase.
+
+#### Origem do problema
+
+A nota escrita sem internet fica guardada no aparelho que a escreveu e só sobe para o Firestore quando
+esse aparelho volta a ter internet. Até lá, nenhum outro aparelho tem como recebê-la. O app não mostra
+essa diferença: a consulta da lista (`lib/providers/user_collections_provider.dart`) não acompanha os
+metadados do Firestore, e a nota pendente aparece igual a uma nota já enviada. Quem não acha a nota no
+outro aparelho escreve de novo, e quando o primeiro aparelho reconecta a original sobe também: a
+conta fica com duas notas iguais.
+
+O envio em si está certo desde a N2. O id da nota é gerado uma vez e gravado com `set`, então reenviar
+a mesma nota sobrescreve o mesmo documento ([#48](https://github.com/notat-scrum/notat/issues/48)). A
+investigação também olhou o botão Save, porque o `addDocument` gera um id novo a cada chamada e dois
+toques poderiam criar duas notas. Num teste com 0 a 200 ms entre os toques ficou uma nota só: quando o
+segundo toque chega, a tela já está saindo. Esse teste entra no projeto pela
+[#62](https://github.com/notat-scrum/notat/issues/62).
+
+### Plano do release
+
+Objetivo: a nota escrita em qualquer aparelho, com ou sem internet, aparece uma vez só e completa nos
+outros aparelhos da conta, e o app mostra o que ainda não foi enviado e o que deu errado.
+
+O MVP:
+
+| Item                                                                   | Critério    | MoSCoW | Justificativa                                                                                               | Estado                                                        |
+| ---------------------------------------------------------------------- | ----------- | ------ | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| Nota salva sem internet entra na lista na hora e sobe num documento só | US03, 1 e 2 | Must   | É o centro do pedido. A gravação já funciona e tem teste                                                    | Pronto, [#48](https://github.com/notat-scrum/notat/issues/48) |
+| Edição repetida sem internet guarda só a última versão                 | US03, 4     | Must   | Sem isso a nota chega ao outro aparelho incompleta                                                          | Pronto, [#48](https://github.com/notat-scrum/notat/issues/48) |
+| O card mostra se a nota foi enviada ou aguarda envio                   | US03, 1 e 2 | Must   | Responde às duas queixas: a pessoa sabe por que a nota ainda não está no outro aparelho e não escreve outra | [#63](https://github.com/notat-scrum/notat/issues/63)         |
+| Dois toques no Save deixam uma nota só, com teste                      | US03, 3     | Should | Já funciona; falta o teste que prova                                                                        | [#62](https://github.com/notat-scrum/notat/issues/62)         |
+| A falha do Firebase vira uma mensagem que a pessoa entende             | US03, 5     | Should | O aviso de falha já existe desde a #48, mas mostra o texto técnico do Firestore                             | [#64](https://github.com/notat-scrum/notat/issues/64)         |
+
+O que fica para depois:
+
+- **Exigir e-mail verificado nas regras do Firestore (Won't).** Está fora do pedido da cliente, e o
+  projeto não tem teste automatizado de regras, que a Definition of Done exige.
+- **Ajustar o ruleset da `master` (Won't).** É configuração da organização no GitHub, não do app.
+
+### Sprint 3
+
+#### Sprint Goal
+
+Quem escreve uma nota sem internet vê no card se ela já foi enviada, e a nota aparece uma vez só,
+completa, no outro aparelho da mesma conta.
+
+#### Já pronto, com o teste que comprova
+
+| Item pronto                                      | Resolvido em                                                                                                 | Teste que comprova                                                                                                                        |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Salvar sem internet não trava a tela             | [#28](https://github.com/notat-scrum/notat/issues/28), [#48](https://github.com/notat-scrum/notat/issues/48) | `addDocument retorna sem esperar o servidor confirmar`                                                                                    |
+| Reenviar a mesma nota deixa um documento só      | [#48](https://github.com/notat-scrum/notat/issues/48)                                                        | `gravar a mesma nota duas vezes deixa um documento so`                                                                                    |
+| Duas edições sem internet deixam a última versão | [#48](https://github.com/notat-scrum/notat/issues/48)                                                        | `duas edicoes seguidas deixam um documento so, com a ultima versao`                                                                       |
+| A falha na gravação chega ao usuário             | [#48](https://github.com/notat-scrum/notat/issues/48)                                                        | `a falha ao criar a nota chega ao usuario depois que a tela fechou`, `a falha ao editar a nota chega ao usuario depois que a tela fechou` |
+
+#### Backlog
+
+Estimativas em pontos de Planning Poker, na sequência de Fibonacci. As issues estão no
+[Marco 5: Sprint 3](https://github.com/notat-scrum/notat/milestone/5). É a última sprint, então cada
+dev ficou com uma issue só, e os itens pequenos entraram junto de uma maior. Nenhuma issue depende de
+outra: a #62 e a #63 mexem no mesmo arquivo, mas em trechos diferentes.
+
+| Issue                                                 | Item                                                            | Origem                          | Pontos | MoSCoW | Justificativa                                                                                        | Responsável                |
+| ----------------------------------------------------- | --------------------------------------------------------------- | ------------------------------- | ------ | ------ | ---------------------------------------------------------------------------------------------------- | -------------------------- |
+| [#62](https://github.com/notat-scrum/notat/issues/62) | Provar o Save único e corrigir o erro ao segurar o card da nota | US03, critério 3; bug           | 3      | Should | O Save único já funciona e falta o teste. O erro do card aparece toda vez que alguém segura uma nota | Vinícius Bonatti Benner    |
+| [#63](https://github.com/notat-scrum/notat/issues/63) | Mostrar no card se a nota já foi enviada                        | US03, critérios 1 e 2           | 5      | Must   | É o que resolve o pedido da cliente                                                                  | Eduardo Hoeft              |
+| [#64](https://github.com/notat-scrum/notat/issues/64) | Aplicar o padrão Adapter nas mensagens de erro do Firebase      | item de reuso; US03, critério 5 | 5      | Must   | É o item de reuso da entrega, e o erro do Firestore hoje chega cru ao usuário                        | Vinícius Leitempergher     |
+| [#65](https://github.com/notat-scrum/notat/issues/65) | Preencher a seção da entrega N3 no README                       | entrega                         | 3      | Must   | O README é o documento avaliado                                                                      | Vinícius Bueno de Oliveira |
+
+A Sprint 3 compromete 16 pontos.
+
+#### Definition of Done
+
+Uma issue só está pronta quando:
+
+- o comportamento que ela muda tem teste automatizado escrito antes da mudança: numa correção, o teste
+  falha antes e passa depois; numa refatoração, o teste de regressão passa antes e depois, sem
+  alteração;
+- o que os arquivos tocados fazem e ainda não tinha teste ganhou teste no mesmo PR;
+- os critérios de aceite da história que ela atende foram conferidos, e o que depende do aparelho tem
+  print no PR;
+- o que já funcionava na N1 e na N2 continua funcionando: o `fvm flutter test` inteiro passa;
+- `fvm dart format .`, `fvm flutter analyze --fatal-infos`, `fvm dart analyze` e `fvm flutter test`
+  passam, e o CI está verde;
+- o PR foi revisado e aprovado por um colega, com os comentários da revisão no próprio PR;
+- está mergeada na `master`, a issue fechou e o card está em Pronto no quadro.
+
+A US03 está pronta quando todas as issues dela estão.
+
+#### Papéis
+
+| Papel         | Integrante                                                     |
+| ------------- | -------------------------------------------------------------- |
+| Product Owner | Vinícius Bueno de Oliveira                                     |
+| Scrum Master  | Vinicius Pedroso Schoeffel                                     |
+| Dev           | Eduardo Hoeft, Vinícius Leitempergher, Vinícius Bonatti Benner |
+
+O PO e o SM também revisam os PRs.
+
+### Item de reuso
+
+Padrão escolhido: Adapter, na [#64](https://github.com/notat-scrum/notat/issues/64). Os erros do
+Firebase Auth e do Firestore chegam ao app em formatos diferentes. Cada origem ganha um adapter que
+converte o erro do SDK para a mensagem que o app mostra. O teste de regressão são os três testes de
+`test/utils/auth_errors_test.dart`, que passam antes e depois da mudança.
+
+Onde foi aplicado e o teste que protege: _a preencher depois do merge._
+
+### Prints
+
+Votação do Planning Poker: _a preencher._
+
+Resultado do `flutter test`: _a preencher._
+
+### Resultado
+
+_A preencher na entrega:_ se o Sprint Goal foi atingido, o que ficou de fora e por quê, e o link do
+vídeo.
+
 ## Pré-requisitos
 
 | Ferramenta     | Versão          | Para quê                                |
