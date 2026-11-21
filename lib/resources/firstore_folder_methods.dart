@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:notat/resources/user_collections.dart';
+import 'package:notat/utils/firestore_errors.dart';
 
 class FirestoreFolderService {
   FirestoreFolderService(this._firestore, this.userUid);
@@ -28,7 +29,7 @@ class FirestoreFolderService {
     try {
       await folders.doc(name).set({'name': name, 'createdAt': Timestamp.now()});
     } on FirebaseException catch (e) {
-      return e.message;
+      return ErroDoFirestoreAdapter(e).texto;
     }
     return null;
   }
@@ -49,7 +50,7 @@ class FirestoreFolderService {
       }
       await lote.commit();
     } on FirebaseException catch (e) {
-      return e.message;
+      return ErroDoFirestoreAdapter(e).texto;
     }
     return null;
   }
