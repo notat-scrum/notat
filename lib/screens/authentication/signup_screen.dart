@@ -154,16 +154,13 @@ class _SignUpDetailsState extends ConsumerState<SignUpDetails> {
                   keyboardType: TextInputType.text,
                   hintText: 'Confirm Password',
                   isPassword: true,
+                  // a forca da senha ja e avisada no campo de senha; aqui so
+                  // interessa se as duas batem
                   validator: (text) {
-                    if (passwordRegExp.hasMatch(text!) &&
-                        passwordController.text == confirmPassController.text) {
+                    if (text == passwordController.text) {
                       return null;
-                    } else if (passwordController.text !=
-                        confirmPassController.text) {
-                      return "Password Confirmation isn't correct";
                     }
-
-                    return 'Weak password, try add a special character/letter/number';
+                    return "Password Confirmation isn't correct";
                   },
                 ),
               ),

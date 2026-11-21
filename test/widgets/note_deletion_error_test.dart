@@ -77,7 +77,72 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
-    // Verifica se a mensagem de erro apareceu na tela.
-    expect(find.text('Missing or insufficient permissions.'), findsOneWidget);
+    // Verifica se aparece a mensagem do app, e nao o texto do Firebase.
+    expect(find.text("You don't have permission to do this."), findsOneWidget);
+  });
+
+  // No aparelho o Firestore tira a nota do cache local antes de o servidor
+  // responder: o card sai da lista e so depois chega a recusa.
+  testWidgets('mostra erro mesmo quando o card some antes da recusa', (
+    tester,
+  ) async {
+    final mostraCard = ValueNotifier(true);
+    addTearDown(mostraCard.dispose);
+    final nota = Note(
+      uid: 'nota-de-teste',
+      title: 'Minha nota',
+      document: '[{"insert":"Conteudo de teste\\n"}]',
+      searchableDocument: 'conteudo de teste',
+      folderId: 'All',
+      date: DateTime(2026, 11, 2),
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          firebaseFirestoreProvider.overrideWithValue(firestore),
+          currentUidProvider.overrideWithValue('usuario-de-teste'),
+        ],
+        child: MaterialApp(
+          home: Scaffold(
+            body: ValueListenableBuilder<bool>(
+              valueListenable: mostraCard,
+              builder: (context, mostra, _) => mostra
+                  ? Center(
+                      child: SizedBox(
+                        width: 180,
+                        height: 250,
+                        child: NoteCard(nota),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final menu = tester.widget<FocusedMenuHolder>(
+      find.byType(FocusedMenuHolder),
+    );
+    menu.menuItems
+        .firstWhere(
+          (item) => item.title is Text && (item.title as Text).data == 'Delete',
+        )
+        .onPressed();
+    await tester.pump();
+    expect(firestore.exclusoes, hasLength(1));
+
+    mostraCard.value = false;
+    await tester.pump();
+    expect(find.byType(NoteCard), findsNothing);
+
+    firestore.exclusoes.single.completeError(
+      FirebaseException(plugin: 'cloud_firestore', code: 'permission-denied'),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.text("You don't have permission to do this."), findsOneWidget);
   });
 }

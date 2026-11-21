@@ -41,6 +41,6 @@ void main() {
 
     await tester.pump();
 
-    expect(find.text('Missing or insufficient permissions.'), findsOneWidget);
+    expect(find.text("You don't have permission to do this."), findsOneWidget);
   });
 }

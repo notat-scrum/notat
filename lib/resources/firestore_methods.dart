@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:notat/models/note.dart';
 import 'package:notat/resources/user_collections.dart';
+import 'package:notat/utils/firestore_errors.dart';
 import 'package:uuid/uuid.dart';
 
 class FirestoreService {
@@ -74,13 +75,12 @@ class FirestoreService {
     }
     unawaited(
       gravacao.catchError(
-        (Object erro) => aviso('The note could not be saved: ${_motivo(erro)}'),
+        (Object erro) => aviso(
+          'The note could not be saved. ${ErroDoFirestoreAdapter(erro).texto}',
+        ),
       ),
     );
   }
-
-  static String _motivo(Object erro) =>
-      erro is FirebaseException ? erro.message ?? erro.code : erro.toString();
 
   /// Emite primeiro o que esta no cache local, entao abre na hora mesmo sem
   /// internet, e de novo a cada gravacao da nota.
@@ -96,7 +96,7 @@ class FirestoreService {
       );
       await _apagaEmLote(documentos);
     } on FirebaseException catch (e) {
-      return e.message;
+      return ErroDoFirestoreAdapter(e).texto;
     }
     return null;
   }
@@ -108,7 +108,7 @@ class FirestoreService {
           .get(const GetOptions(source: Source.cache));
       await _apagaEmLote(documentos);
     } on FirebaseException catch (e) {
-      return e.message;
+      return ErroDoFirestoreAdapter(e).texto;
     }
     return null;
   }
@@ -117,7 +117,7 @@ class FirestoreService {
     try {
       await _notes.doc(uid).delete();
     } on FirebaseException catch (e) {
-      return e.message;
+      return ErroDoFirestoreAdapter(e).texto;
     }
     return null;
   }
@@ -127,7 +127,7 @@ class FirestoreService {
       await _apagaEmLote(await _notes.get());
       await _apagaEmLote(await _folders.get());
     } on FirebaseException catch (e) {
-      return e.message;
+      return ErroDoFirestoreAdapter(e).texto;
     }
     return null;
   }

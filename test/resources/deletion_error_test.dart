@@ -23,7 +23,7 @@ void main() {
 
     final erro = await resultado;
 
-    expect(erro, 'Missing or insufficient permissions.');
+    expect(erro, "You don't have permission to do this.");
   });
 
   test('deleteNote retorna null quando exclusao funciona', () async {
