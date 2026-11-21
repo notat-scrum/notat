@@ -15,6 +15,9 @@ final recusa = FirebaseException(
   message: 'Missing or insufficient permissions.',
 );
 
+const avisoEsperado =
+    "The note could not be saved. You don't have permission to do this.";
+
 void main() {
   late FirestoreControlado firestore;
   late ProviderContainer container;
@@ -76,7 +79,8 @@ void main() {
       firestore.gravacoes.single.completeError(recusa);
       await tester.pumpAndSettle();
 
-      expect(find.textContaining(recusa.message!), findsOneWidget);
+      expect(find.text(avisoEsperado), findsOneWidget);
+      expect(find.textContaining(recusa.message!), findsNothing);
     },
   );
 
@@ -101,7 +105,8 @@ void main() {
       firestore.gravacoes.single.completeError(recusa);
       await tester.pumpAndSettle();
 
-      expect(find.textContaining(recusa.message!), findsOneWidget);
+      expect(find.text(avisoEsperado), findsOneWidget);
+      expect(find.textContaining(recusa.message!), findsNothing);
     },
   );
 }

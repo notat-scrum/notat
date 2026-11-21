@@ -77,7 +77,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
-    // Verifica se a mensagem de erro apareceu na tela.
-    expect(find.text('Missing or insufficient permissions.'), findsOneWidget);
+    // Verifica se aparece a mensagem do app, e nao o texto do Firebase.
+    expect(find.text("You don't have permission to do this."), findsOneWidget);
   });
 }
