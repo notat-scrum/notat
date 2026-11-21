@@ -135,14 +135,19 @@ class _NoteCardState extends ConsumerState<NoteCard> {
           ),
           title: const Text('Delete'),
           onPressed: () async {
+            // o Firestore tira a nota do cache local antes de o servidor
+            // responder, e o card sai da tela; o aviso e preparado antes do
+            // await para a recusa ainda chegar ao usuario
+            final avisa = CustomSnackBar.preparar(
+              context,
+              const Duration(seconds: 3),
+            );
             final erro = await ref
                 .read(firestoreServiceProvider)
                 .deleteNote(uid: widget.nota.uid);
 
-            if (!context.mounted) return;
-
             if (erro != null) {
-              CustomSnackBar.show(context, erro, const Duration(seconds: 3));
+              avisa(erro);
             }
           },
           backgroundColor: Colors.redAccent,
@@ -185,7 +190,9 @@ class _NoteCardState extends ConsumerState<NoteCard> {
                 focusNode: _focusNode,
                 config: const quill.QuillEditorConfig(
                   padding: EdgeInsets.only(bottom: 10),
-                  autoFocus: true,
+                  // a previa e so leitura; com foco automatico, o card que
+                  // sai da tela leva junto um FocusNode ainda focado
+                  autoFocus: false,
                   enableInteractiveSelection: false,
                   showCursor: false,
                   scrollPhysics: NeverScrollableScrollPhysics(),
