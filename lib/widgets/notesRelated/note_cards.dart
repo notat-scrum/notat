@@ -48,66 +48,20 @@ class NoteCards extends StatelessWidget {
   }
 }
 
-/// Cada card e um widget com estado proprio porque o editor de previa precisa de
-/// um QuillController, um ScrollController e um FocusNode, e os tres precisam ser
-/// liberados quando o card sai da tela.
-class NoteCard extends ConsumerStatefulWidget {
+class NoteCard extends ConsumerWidget {
   const NoteCard(this.nota, {super.key});
 
   final Note nota;
 
-  @override
-  ConsumerState<NoteCard> createState() => _NoteCardState();
-}
-
-class _NoteCardState extends ConsumerState<NoteCard> {
-  late quill.QuillController _controller;
-
-  final ScrollController _scrollController = ScrollController(
-    keepScrollOffset: false,
-  );
-
-  final FocusNode _focusNode = FocusNode();
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = _criaController();
-  }
-
-  @override
-  void didUpdateWidget(NoteCard oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (oldWidget.nota.document != widget.nota.document) {
-      _controller.dispose();
-      _controller = _criaController();
-    }
-  }
-
-  quill.QuillController _criaController() => quill.QuillController(
-    document: quill.Document.fromJson(jsonDecode(widget.nota.document)),
-    selection: const TextSelection.collapsed(offset: 0),
-    readOnly: true,
-  );
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    _scrollController.dispose();
-    _focusNode.dispose();
-    super.dispose();
-  }
-
-  void _abreEdicao() {
+  void _abreEdicao(BuildContext context) {
     Navigator.of(
       context,
       rootNavigator: true,
-    ).push(FadeTrans(translateTo: EditNote(noteUid: widget.nota.uid)));
+    ).push(FadeTrans(translateTo: EditNote(noteUid: nota.uid)));
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return FocusedMenuHolder(
       menuWidth: 200,
       menuOffset: 10,
@@ -117,7 +71,7 @@ class _NoteCardState extends ConsumerState<NoteCard> {
       ),
       animateMenuItems: false,
       blurBackgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      onPressed: _abreEdicao,
+      onPressed: () => _abreEdicao(context),
       menuItems: [
         FocusedMenuItem(
           trailingIcon: const Icon(
@@ -125,7 +79,7 @@ class _NoteCardState extends ConsumerState<NoteCard> {
             color: Color.fromARGB(178, 255, 255, 255),
           ),
           title: const Text('Edit'),
-          onPressed: _abreEdicao,
+          onPressed: () => _abreEdicao(context),
           backgroundColor: const Color.fromARGB(255, 57, 55, 78),
         ),
         FocusedMenuItem(
@@ -144,7 +98,7 @@ class _NoteCardState extends ConsumerState<NoteCard> {
             );
             final erro = await ref
                 .read(firestoreServiceProvider)
-                .deleteNote(uid: widget.nota.uid);
+                .deleteNote(uid: nota.uid);
 
             if (erro != null) {
               avisa(erro);
@@ -162,7 +116,7 @@ class _NoteCardState extends ConsumerState<NoteCard> {
         child: Column(
           children: [
             AutoSizeText(
-              widget.nota.title,
+              nota.title,
               minFontSize: 16,
               maxLines: 4,
               textAlign: TextAlign.left,
@@ -184,28 +138,12 @@ class _NoteCardState extends ConsumerState<NoteCard> {
                   ],
                 ).createShader(bounds);
               }),
-              child: quill.QuillEditor(
-                scrollController: _scrollController,
-                controller: _controller,
-                focusNode: _focusNode,
-                config: const quill.QuillEditorConfig(
-                  padding: EdgeInsets.only(bottom: 10),
-                  // a previa e so leitura; com foco automatico, o card que
-                  // sai da tela leva junto um FocusNode ainda focado
-                  autoFocus: false,
-                  enableInteractiveSelection: false,
-                  showCursor: false,
-                  scrollPhysics: NeverScrollableScrollPhysics(),
-                  scrollable: true,
-                  expands: false,
-                  maxHeight: 150,
-                ),
-              ),
+              child: _PreviaDaNota(nota.document),
             ),
             Row(
               children: [
                 Text(
-                  Jiffy.parseFromDateTime(widget.nota.date).MMMd,
+                  Jiffy.parseFromDateTime(nota.date).MMMd,
                   style: GoogleFonts.roboto(
                     fontSize: 12,
                     color: const Color.fromARGB(90, 255, 255, 255),
@@ -215,7 +153,7 @@ class _NoteCardState extends ConsumerState<NoteCard> {
                 SizedBox(
                   width: 85,
                   child: Text(
-                    widget.nota.folderId,
+                    nota.folderId,
                     textAlign: TextAlign.end,
                     overflow: TextOverflow.ellipsis,
                     softWrap: true,
@@ -229,6 +167,75 @@ class _NoteCardState extends ConsumerState<NoteCard> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// O FocusedMenuHolder desenha o card duas vezes (lista e menu); cada copia
+/// precisa do proprio ScrollController, por isso eles vivem aqui e nao no card.
+class _PreviaDaNota extends StatefulWidget {
+  const _PreviaDaNota(this.document);
+
+  final String document;
+
+  @override
+  State<_PreviaDaNota> createState() => _PreviaDaNotaState();
+}
+
+class _PreviaDaNotaState extends State<_PreviaDaNota> {
+  late quill.QuillController _controller;
+  final ScrollController _scrollController = ScrollController(
+    keepScrollOffset: false,
+  );
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = _criaController();
+  }
+
+  @override
+  void didUpdateWidget(_PreviaDaNota oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.document != widget.document) {
+      _controller.dispose();
+      _controller = _criaController();
+    }
+  }
+
+  quill.QuillController _criaController() => quill.QuillController(
+    document: quill.Document.fromJson(jsonDecode(widget.document)),
+    selection: const TextSelection.collapsed(offset: 0),
+    readOnly: true,
+  );
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _scrollController.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return quill.QuillEditor(
+      scrollController: _scrollController,
+      controller: _controller,
+      focusNode: _focusNode,
+      config: const quill.QuillEditorConfig(
+        padding: EdgeInsets.only(bottom: 10),
+        // a previa e so leitura; com foco automatico, o card que
+        // sai da tela leva junto um FocusNode ainda focado
+        autoFocus: false,
+        enableInteractiveSelection: false,
+        showCursor: false,
+        scrollPhysics: NeverScrollableScrollPhysics(),
+        scrollable: true,
+        expands: false,
+        maxHeight: 150,
       ),
     );
   }
