@@ -33,7 +33,7 @@ class AuthService {
       await credencial.user!.sendEmailVerification();
       return null;
     } on FirebaseException catch (e) {
-      return traduzErroDeAuth(e);
+      return ErroDoAuthAdapter(e).texto;
     }
   }
 
@@ -45,7 +45,7 @@ class AuthService {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
     } on FirebaseException catch (e) {
-      feedback = traduzErroDeAuth(e);
+      feedback = ErroDoAuthAdapter(e).texto;
     }
     return feedback;
   }
@@ -54,7 +54,7 @@ class AuthService {
     try {
       await _auth.sendPasswordResetEmail(email: email);
     } on FirebaseAuthException catch (e) {
-      return traduzErroDeAuth(e);
+      return ErroDoAuthAdapter(e).texto;
     }
     return null;
   }
@@ -63,7 +63,7 @@ class AuthService {
     try {
       await _auth.signOut();
     } on FirebaseAuthException catch (e) {
-      return traduzErroDeAuth(e);
+      return ErroDoAuthAdapter(e).texto;
     }
     return null;
   }
@@ -77,7 +77,7 @@ class AuthService {
       await FirestoreService(_firestore, usuario.uid).deleteAllDocs();
       await usuario.delete();
     } on FirebaseException catch (e) {
-      return traduzErroDeAuth(e);
+      return ErroDoAuthAdapter(e).texto;
     }
     return null;
   }
@@ -86,7 +86,7 @@ class AuthService {
     try {
       await _auth.currentUser?.reload();
     } on FirebaseException catch (e) {
-      return traduzErroDeAuth(e);
+      return ErroDoAuthAdapter(e).texto;
     }
     return null;
   }
@@ -103,7 +103,7 @@ class AuthService {
       );
       await usuario.reauthenticateWithCredential(credencial);
     } on FirebaseException catch (e) {
-      return traduzErroDeAuth(e);
+      return ErroDoAuthAdapter(e).texto;
     }
     return null;
   }
